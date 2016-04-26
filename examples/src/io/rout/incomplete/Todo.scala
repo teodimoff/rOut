@@ -2,9 +2,7 @@ package io.rout.incomplete
 
 import scala.collection.mutable
 
-/**
-  * Created by betepahos on 25.04.16.
-  */
+
 case class Todo(id: Int, title: String, completed: Boolean, order: Option[Int],
                 daysToComplete: Int,relatedTodos: Option[Seq[Int]], advisor: Option[String])
 

@@ -3,10 +3,6 @@ package io.rout.routing
 import com.twitter.finagle.{Service, SimpleFilter}
 import com.twitter.finagle.http._
 
-/**
- * Created by betepahos on 31.01.16.
- */
-
 object ExceptionFilter extends SimpleFilter[Request,Response] {
   def apply(request: Request, service: Service[Request, Response]) = {
     service(request) handle {

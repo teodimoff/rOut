@@ -7,9 +7,6 @@ import io.rout.path.Path
 import shapeless.Lazy
 import scala.reflect.ClassTag
 
-/**
-  * Created by betepahos on 25.04.16.
-  */
 package object routing extends ReqReads {
 
 

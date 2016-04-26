@@ -8,14 +8,10 @@ import com.twitter.server.TwitterServer
 import com.twitter.util.{Await, Future}
 import io.rout._
 import io.routs._
-
 import io.rout.generic.decoding._
-
 import scala.util.Random
 
-/**
-  * Created by betepahos on 25.04.16.
-  */
+
 object Main extends TwitterServer {
 
   val port: Flag[Int] = flag("port", 8081, "TCP port for HTTP server")

@@ -109,5 +109,4 @@ case class RequestToService(request: Request => Boolean,service: Service[Request
 
   def withFilter(filter: Filter[Request,Response,Request,Response]) =
     copy(service = filter andThen service)
-
 }

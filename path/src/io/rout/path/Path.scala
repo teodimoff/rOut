@@ -1,10 +1,6 @@
 package io.rout.path
 
-/**
- *
- */
 
-/** Base class for path extractors. */
 abstract class Path { self =>
 
   def depth: Int = self.toList.size
@@ -127,14 +123,6 @@ object Path {
     def /[B](other: Path => MatchPath[B])(implicit c: PathMatcher[B]): Path => Option[((A,B),Path)] =
       (path: Path) => pathFun(path).flatMap(x=> other(x._2).asCur[B].apply(x._2).map(b => ((x._1,b._1),b._2)))
   }
-
-/*
-  implicit class PathOps[A](val path: Path => Option[(Int,A)]) extends AnyVal {
-    def /[B](other: Path => Match[B])(implicit c: PathMatcher[B]): Path => Option[(Int,(A,B))] =
-      (path2: Path) => path(path2).flatMap{a=> other(path2).as2[B](a._1 + 1).apply(path2).map(b=> (a._1 + 1,(a._2,b)))
-      }
-  }
- */
 
 }
 

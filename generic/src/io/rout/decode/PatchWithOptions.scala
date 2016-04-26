@@ -2,9 +2,7 @@ package io.rout.generic.decoding
 
 import shapeless.labelled._
 import shapeless.{::, HList, HNil}
-/**
- * Created by betepahos on 02.12.15.
- */
+
 trait PatchWithOptions[R <: HList] {
   type Out <: HList
 

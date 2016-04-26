@@ -9,25 +9,9 @@ import com.twitter.io.Files
 import com.twitter.util.Future
 import com.twitter.conversions.storage._
 import scala.collection.convert.wrapAll._
-/**
- * Created by betepahos on 03.02.16.
- */
+
 object FileOps extends GlobalFlag[String]("","Use local file system for fileService (empty = jar) eg. " +
   "-io.rout.file.FileOps=/home/xx/xxx/"){
-
-  /*
-    type Resource = (Request,Int,String,Int,Response)
-
-  private [this] val cache = CacheBuilder
-  .newBuilder()
-  .maximumSize(10000)
-  .build[Resource,Future[Response]](new CacheLoader[Resource,Future[Response]] {
-  def load(req: Resource): Future[Response] ={ println("loading") ; resource(req._1,req._2,req._3,req._4,req._5) }
-  })
-
-  private [this] val assetCache = GuavaCache.fromLoadingCache(cache)
-   */
-  // Todo: make cache (String,String) => Future[Response]
 
   private [this] val cache = CacheBuilder
   .newBuilder()

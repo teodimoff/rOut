@@ -3,9 +3,6 @@ package io.rout.path
 import com.twitter.util.{Eval, Try}
 import scala.reflect.ClassTag
 
-/**
-  * Created by betepahos on 07.04.16.
-  */
 trait PathMatcher[A] {
   def apply(s:String): Option[A]
 
