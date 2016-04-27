@@ -38,8 +38,8 @@ object Main extends TwitterServer {
       case None => throw new TodoNotFound(id)
     }
   }
-
-  val optionsTodo = CorsFilter("*","POST,GET") andThen options(Root / "todo")(o => Ok("todo"))
+  //for options you need to set Origin header and with Access-Control-Request-Method:POST or Get or...
+  val optionsTodo = options(Root / "todo")(o => Ok("todo"))
 
   val getTodos = get(Root / "todos")(r => Ok(Todo.list().mkString("\n")))
 
@@ -119,7 +119,7 @@ object Main extends TwitterServer {
 
     val server = Http.server
       .configured(Stats(statsReceiver))
-      .serve(s":${port()}",rOut.service)
+      .serve(s":${port()}", CorsFilter("*","POST,GET") andThen rOut.service)
 
     onExit { server.close() }
 

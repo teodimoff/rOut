@@ -40,9 +40,9 @@ package object routing extends ReqReads {
         rr(request) flatMap (a => service(a))
     }
 
-    def toFilter2[B] = new Filter[ReqExt[B], Response, (A,B), Response] {
-      def apply(requestExt: ReqExt[B], service: Service[(A,B), Response]) =
-        rr(requestExt.request) flatMap (a => service((a,requestExt.value)))
+    def toFilter2[B] = new Filter[ReqExt[B], Response, (B,A), Response] {
+      def apply(requestExt: ReqExt[B], service: Service[(B,A), Response]) =
+        rr(requestExt.request) flatMap (a => service((requestExt.value,a)))
     }
 
     def joinOption[B](b:ReqRead[B]):ReqRead[(A,Option[B])] =
