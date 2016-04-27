@@ -19,6 +19,12 @@ package object routing extends ReqReads {
       def apply(request: Request, service: Service[Option[(A,B)], Response]) =
         filter.andThen(a=> service(path(Path(request.path)).map(b => (a,b._1))))(request)
     }
+
+    def joinPath2[B,C](path: Path => Option[(B,Path)]) = new Filter[ReqExt[C], Response,Option[(C,A,B)], Response] {
+      def apply(requestExt: ReqExt[C], service: Service[Option[(C,A,B)], Response]) =
+        filter.andThen(a=>
+          service(path(Path(requestExt.request.path)).map(b => (requestExt.value,a,b._1))))(requestExt.request)
+    }
   }
 
   implicit class PathOps[A](val path: Path => Option[A]) extends AnyVal {
@@ -32,6 +38,11 @@ package object routing extends ReqReads {
     def toFilter = new Filter[Request, Response, A, Response] {
       def apply(request: Request, service: Service[A, Response]) =
         rr(request) flatMap (a => service(a))
+    }
+
+    def toFilter2[B] = new Filter[ReqExt[B], Response, (A,B), Response] {
+      def apply(requestExt: ReqExt[B], service: Service[(A,B), Response]) =
+        rr(requestExt.request) flatMap (a => service((a,requestExt.value)))
     }
 
     def joinOption[B](b:ReqRead[B]):ReqRead[(A,Option[B])] =
