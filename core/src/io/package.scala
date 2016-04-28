@@ -2,7 +2,7 @@ package io
 
 import com.twitter.finagle.Filter
 import com.twitter.finagle.http.{Request, Response}
-import io.rout.routing.{PathToServiceOption, RequestToService, Rout}
+import io.rout.routing.{RequestToService, Rout}
 
 /**
  *

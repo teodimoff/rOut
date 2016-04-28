@@ -10,6 +10,7 @@ import io.rout._
 import io.routs._
 import io.rout.generic.decoding._
 import rOut.examples.src.io.rout.auth.{AuthFilter, AuthedReq, Passport, PassportDatabase}
+import shapeless.Lazy
 
 import scala.util.Random
 
@@ -34,13 +35,15 @@ object Main extends TwitterServer {
     Created(passport.toString)
   }
 
-  val authedTodo = post[AuthedReq](Root / "todo").filter(derivedTodo) { (auth, todo) =>
+  val authedTodo = post(Root / "todo").filter[AuthedReq,Todo](derivedTodo) { (auth, todo) =>
     todos.incr()
     Todo.save(todo)
-    Created(s"User ${auth.passport.name.toUpperCase} Created -> ${todo.toString}")
+    Created(s"User ${auth.passport.name.capitalize} Created -> ${todo.toString}")
   }
-  //specifying path return type is awkward. can we make things better?
-  val authedTodoPath = post[AuthedReq,String](Root / "todo" / Match[String]).filter(derivedTodo) { (auth,string,todo) =>
+
+  val authedTodoPath =
+    post(Root / "todo" / Match[String] / Match[Int]).filter[AuthedReq,Todo](derivedTodo) { (auth, string, todo) =>
+
     todos.incr()
     Todo.save(todo)
     Created(s"User ${auth.passport.name.toUpperCase} Created -> ${todo.toString}")

@@ -8,7 +8,7 @@ object ExceptionFilter extends SimpleFilter[Request,Response] {
     service(request) handle {
       case error =>
         val statusCode = error match {
-                    case _: ServiceException => Status.NotFound
+                    case _: ServiceException => Status.Unauthorized
                     case _: IllegalArgumentException => Status.NotAcceptable
                     case _: Throwable => Status.NotFound
                     case _ => Status.Forbidden
