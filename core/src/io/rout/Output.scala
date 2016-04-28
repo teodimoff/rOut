@@ -4,8 +4,6 @@ import algebra.Eq
 import com.twitter.finagle.http.{Cookie, Response, Status, Version}
 import com.twitter.util.{Await, Future, Try}
 
-/**
- */
 sealed trait Output[+A] { self =>
 
   protected def meta: Output.Meta

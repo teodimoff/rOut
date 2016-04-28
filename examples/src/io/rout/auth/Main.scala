@@ -9,9 +9,7 @@ import com.twitter.util.{Await, Future}
 import io.rout._
 import io.routs._
 import io.rout.generic.decoding._
-import rOut.examples.src.io.rout.auth.{AuthFilter, AuthedReq, Passport, PassportDatabase}
-import shapeless.Lazy
-
+import rOut.examples.src.io.rout.auth._
 import scala.util.Random
 
 

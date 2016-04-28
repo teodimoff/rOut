@@ -2,9 +2,6 @@ package io.rout
 
 import shapeless.Witness
 
-/**
-  * Created by betepahos on 25.04.16.
-  */
 package object contentTypes {
   object Application {
     type Json = Witness.`"application/json"`.T
