@@ -52,4 +52,7 @@ class Routing(seq: Seq[RequestToService],futureNotFound: Future[Response]) {
   }
 
   def service =  ExceptionFilter andThen Service.mk[Request,Response](request => matchRequest(seq,request))
+
+  //def service =  Service.mk[Request,Response](request => matchRequest(seq,request))
+
 }

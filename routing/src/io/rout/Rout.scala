@@ -18,12 +18,8 @@ trait Rout {
   def mkRoutes(seq: Seq[RequestToService], fnd: Future[Response] = Future.value(notFound)) =
     new Routing(seq,fnd)
 
-    def mkRoutable(seq: Seq[Routable],
-                 futureNotFound: Future[Response] = Future.value(notFound)) = {
-      log.log(Level.INFO,"\n" + seq.map(r=> r.routes.map(x=>
-        s"""\n${r.className}""").mkString("")).mkString("\n"))
-      new Routing(seq.flatMap(_.routes),futureNotFound)
-    }
+  def mkRoutable(seq: Seq[Routable], futureNotFound: Future[Response] = Future.value(notFound)) =
+    new Routing(seq.flatMap(_.routes),futureNotFound)
 
   def path[A] = MatchPath[A] _
 

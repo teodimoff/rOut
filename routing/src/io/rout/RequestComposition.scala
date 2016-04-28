@@ -27,11 +27,14 @@ case class PathToService[A](m: Method,path: Path){
   def apply(filter: Filter[Request,Response,A,Response])(service: A => Future[Response]) =
     RequestToService(reqFn(m,path),Service.mk(filter andThen service))
 
-  def apply[B,C,CT <:String](filter: Lazy[Filter[Request,Response,ReqExt[A],Response]])
-           (rr: ReqRead[B])(service: (A,B) => Output[C])(implicit tr: ToResponse.Aux[Output[C],CT] ) = {
+
+  def filter[B,C,CT <:String](rr: ReqRead[B])(service: (A,B) => Output[C])
+                             (implicit tr: ToResponse.Aux[Output[C],CT]) = {
+    (filter: Filter[Request,Response,ReqExt[A],Response]) =>
     RequestToService(reqFn(m, path),
-      Service.mk(filter.value.andThen(rr.toFilter2[A]) andThen service.tupled.andThen(x=> Future(tr(x)))))
+      Service.mk(filter.andThen(rr.toFilter2[A]) andThen service.tupled.andThen(x=> Future(tr(x)))))
   }
+
   def apply[B,CT <:String](rr: ReqRead[Future[A]])(service: A => Output[B])
                         (implicit tr: ToResponse.Aux[Output[B],CT] ) = {
     RequestToService(reqFn(m,path),Service.mk(rr.toFilter andThen service.andThen(x=> Future(tr(x)))))
@@ -61,13 +64,11 @@ case class PathToServiceOption[A,B](m: Method,path: Path => Option[(B,Path)],not
       case Some((a,b)) => service(b,a)
     })))
 
-
   def service(rr: ReqRead[Future[A]])(service: (B,A) => Future[Response]) =
     RequestToService(reqFn(m, Path(path)), Service.mk(rr.toFilter.joinPath[B](path).andThen(abo => abo match {
       case None => notFound
       case Some((a,b)) => service(b,a)
     })))
-
 
   def apply[C,CT <:String](service: B => Output[C])
                           (implicit tr: ToResponse.Aux[Output[C],CT] ) = {
@@ -87,23 +88,34 @@ case class PathToServiceOption[A,B](m: Method,path: Path => Option[(B,Path)],not
       }
     )))
 
-  def apply[C,D,CT <:String](filter: Lazy[Filter[Request,Response,ReqExt[C],Response]])
-                            (rr: ReqRead[A])(service: (C,B,A) => Output[D])(implicit tr: ToResponse.Aux[Output[D],CT] ) = {
+  def filter[C,D,CT <:String](rr: ReqRead[C])(service: (A,B,C) => Output[D])
+                             (implicit tr: ToResponse.Aux[Output[D],CT]) = {
+    (filter: Filter[Request,Response,ReqExt[A],Response]) =>
     RequestToService(reqFn(m, Path(path)),
-      Service.mk(filter.value.andThen(rr.toFilter.joinPath2[B,C](path)).andThen(abo =>
+      Service.mk(filter.andThen(rr.toFilter.joinPath2[B,A](path)).andThen(abo =>
         abo match {
           case None => notFound
-          case Some((c,a,b)) => Future(tr(service(c,b,a)))
+          case Some((a,c,b)) => Future(tr(service(a,b,c)))
         }
       )))
   }
+
+/*
+
+  def filter[C,D,CT <:String](rr: ReqRead[B])(service: (A,B) => Output[C])(implicit
+    tr: ToResponse.Aux[Output[C],CT],reqExt: ReqExt[A]) = {
+    (filter: Filter[Request,Response,ReqExt[A],Response]) =>
+      RequestToService(reqFn(m, Path(path)),
+        Service.mk(filter.andThen(rr.toFilter2[A]) andThen service.tupled.andThen(x=> Future(tr(x)))))
+  }
+ */
 
   def apply[C,CT <:String](rr: Lazy[ReqRead[A]])(service: (B,A)=> Output[C])
                         (implicit tr: ToResponse.Aux[Output[C], CT]): RequestToService = {
     RequestToService(reqFn(m, Path(path)), Service.mk(rr.value.toFilter.joinPath[B](path).andThen(abo =>
       abo match {
       case None => notFound
-      case Some(ab) => Future(tr(service(ab._2, ab._1)))
+      case Some((a,b)) => Future(tr(service(b,a)))
       }
     )))
   }
@@ -113,7 +125,7 @@ case class PathToServiceOption[A,B](m: Method,path: Path => Option[(B,Path)],not
     RequestToService(reqFn(m, Path(path)), Service.mk(rr.toFilter.joinPath[B](path).andThen(abo =>
       abo match {
       case None => notFound
-      case Some(ab) => Future(tr(service(ab._2, ab._1)))
+      case Some((a,b)) => Future(tr(service(b,a)))
       }
     )))
   }
