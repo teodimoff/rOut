@@ -25,23 +25,22 @@ object Main extends TwitterServer {
 
   val derivedTodo: ReqRead[Todo] = derive[Int => Todo].incomplete.map(_(Random.nextInt(10000)))
 
-  val getRegistered = get(Root / "registered")(r => Ok(PassportDatabase.list().mkString("\n")))
+  val getTodos = get(Root / "todos").filter1[AuthedReq]()(r => Ok(Todo.list().mkString("\n")))
 
-  val register = post(Root / "register")(passportDerive){passport =>
-    passports.incr()
-    PassportDatabase.save(passport)
-    Created(passport.toString)
+  val getTodo = get(Root / "todo" / Match[Int]).filter1[AuthedReq](){ (auth, id) =>
+    Todo.get(id) match {
+      case Some(t) => Todo.delete(id); Ok(t.toString)
+      case None => throw new TodoNotFound(id)
+    }
   }
 
-  val authedTodo = post(Root / "todo").filter[AuthedReq,Todo](derivedTodo) { (auth, todo) =>
+  val todo = post(Root / "todo").filter[AuthedReq,Todo](derivedTodo) { (auth, todo) =>
     todos.incr()
     Todo.save(todo)
     Created(s"User ${auth.passport.name.capitalize} Created -> ${todo.toString}")
   }
 
-  val authedTodoPath =
-    post(Root / "todo" / Match[String] / Match[Int]).filter[AuthedReq,Todo](derivedTodo) { (auth, string, todo) =>
-
+  val todoPath = post(Root / "todo" / Match[String]).filter[AuthedReq,Todo](derivedTodo) { (auth, string, todo) =>
     todos.incr()
     Todo.save(todo)
     Created(s"User ${auth.passport.name.toUpperCase} Created -> ${todo.toString}")
@@ -53,6 +52,14 @@ object Main extends TwitterServer {
     Created(todo.toString)
   }
 
+  val getRegistered = get(Root / "registered")(r => Ok(PassportDatabase.list().mkString("\n")))
+
+  val register = post(Root / "register")(passportDerive){passport =>
+    passports.incr()
+    PassportDatabase.save(passport)
+    Created(passport.toString)
+  }
+
   val deleteRegistered = delete(Root / "registered") { req =>
     val all: List[Passport] = PassportDatabase.list()
     all.foreach(t => PassportDatabase.delete(t.password))
@@ -60,13 +67,14 @@ object Main extends TwitterServer {
   }
 
   val rOut = mkRoutes(Seq(
-    AuthFilter.auth andThen authedTodo,
-    AuthFilter.auth andThen authedTodoPath,
+    AuthFilter.auth andThen getTodo,
+    AuthFilter.auth andThen getTodos,
+    AuthFilter.auth andThen todo,
+    AuthFilter.auth andThen todoPath,
     regularTodo,
     getRegistered,
     register,
     deleteRegistered
-
   ))
     .withNotFound("path was not found")
 
