@@ -18,6 +18,8 @@ package object contentTypes {
     type Plain = Witness.`"text/plain"`.T
     type Html = Witness.`"text/html"`.T
   }
+
+
 }
 
 

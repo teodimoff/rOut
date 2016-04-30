@@ -1,4 +1,4 @@
-package rOut.examples.src.io.rout.auth
+package io.rout.benchmark
 
 import com.twitter.finagle.{Filter, Service, ServiceException}
 import com.twitter.finagle.http.{Request, Response}

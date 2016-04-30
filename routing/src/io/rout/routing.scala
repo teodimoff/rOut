@@ -9,9 +9,6 @@ import scala.reflect.ClassTag
 
 package object routing extends ReqReads {
 
-
- //implicit def reqToReqExt[A](a:A): RequestExt[A] = new A with RequestExt[A]
-
  // val async = io.rout.asyncBody.toFilter
 
   implicit class FilterOps[A](val filter: Filter[Request, Response,A, Response]) extends AnyVal {

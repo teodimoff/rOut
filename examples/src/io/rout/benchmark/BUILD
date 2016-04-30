@@ -1,4 +1,4 @@
-scala_library(name = 'auth',
+scala_library(name = 'benchmark',
   dependencies = [
      'projects3/rOut/generic/src/io/rout/decode:decoding',
      '3rdparty/jvm/com/twitter:finagle-http',
@@ -9,9 +9,9 @@ scala_library(name = 'auth',
 ) 
 
 jvm_binary(name='binary',
-  basename='rOut-app',
-  main='io.rout.auth.Main',
+  basename='rOut-benchmark-app',
+  main='io.rout.benchmark.Main',
   dependencies=[
-  ':auth'
+  ':benchmark'
   ]
 )

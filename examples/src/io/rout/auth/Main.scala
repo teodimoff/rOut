@@ -2,14 +2,15 @@ package io.rout.auth
 
 import com.twitter.app.Flag
 import com.twitter.finagle.Http
-import com.twitter.finagle.param.Stats
-import com.twitter.finagle.stats.Counter
+import com.twitter.finagle.stats.{Counter, NullStatsReceiver}
+import com.twitter.finagle.tracing.NullTracer
 import com.twitter.server.TwitterServer
 import com.twitter.util.{Await, Future}
 import io.rout._
 import io.routs._
 import io.rout.generic.decoding._
 import rOut.examples.src.io.rout.auth._
+
 import scala.util.Random
 
 
@@ -23,7 +24,7 @@ object Main extends TwitterServer {
 
   val passportDerive = derive[Passport].fromParams
 
-  val derivedTodo: ReqRead[Todo] = derive[Int => Todo].incomplete.map(_(Random.nextInt(10000)))
+  val derivedTodo: ReqRead[Todo] = derive[Int => Todo].incomplete.map(_(Random.nextInt(100000)))
 
   val getTodos = get(Root / "todos").filter1[AuthedReq]()(r => Ok(Todo.list().mkString("\n")))
 
@@ -34,7 +35,7 @@ object Main extends TwitterServer {
     }
   }
 
-  val todo = post(Root / "todo").filter[AuthedReq,Todo](derivedTodo) { (auth, todo) =>
+  val todo = post(Root / "todo").filter[AuthedReq](derivedTodo) { (auth, todo) =>
     todos.incr()
     Todo.save(todo)
     Created(s"User ${auth.passport.name.capitalize} Created -> ${todo.toString}")
@@ -82,7 +83,10 @@ object Main extends TwitterServer {
     log.info("Serving the Todo Incompletes application (extract from request params)")
 
     val server = Http.server
-      .configured(Stats(statsReceiver))
+      .withCompressionLevel(0)
+      .withStatsReceiver(NullStatsReceiver)
+      //.configured(Stats(statsReceiver))
+      .withTracer(NullTracer)
       .serve(s":${port()}", rOut.service)
 
     onExit { server.close() }
