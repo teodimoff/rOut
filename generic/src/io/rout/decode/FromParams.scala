@@ -35,43 +35,100 @@ object FromParamsExtract extends Poly1 {
   }
 
   implicit def nestedOption[Repr <: HList,V](implicit
-   gen: LabelledGeneric.Aux[V, Repr],
-   fp:  Lazy[FromParams[Repr]]
-   ): Case.Aux[String,ReqRead[Option[V]]] = at[String]{ key =>
+    gen: LabelledGeneric.Aux[V, Repr],
+    fp:  Lazy[FromParams[Repr]]
+  ): Case.Aux[String,ReqRead[Option[V]]] = at[String]{ key =>
     derive[V].fromParams.lift
   }
 
+
   implicit def optionalExtract[V](implicit
-   dh: Decode[V],
+   dh: Decode.TextPlain[String,V],
    ct: ClassTag[V]
   ): Case.Aux[String,ReqRead[Option[V]]] = at[String]{ key =>
-   paramOption(key).as(dh,ct)
-   }
+   paramOption(key).asText(dh,ct)
+  }
 
   implicit def seqExtractor[V](implicit
-   dh: Decode[V],
+   dh: Decode.TextPlain[String,V],
    ct: ClassTag[V]
   ): Case.Aux[String, ReqRead[Seq[V]]] = at[String] { key =>
-    paramsNonEmpty(key).as(dh, ct)
+    paramsNonEmpty(key).asText(dh, ct)
   }
 
   implicit def seqExtractorOption[V](implicit
-   dh: Decode[V],
+   dh:Decode.TextPlain[String,V],
    ct: ClassTag[V]
   ): Case.Aux[String, ReqRead[Option[Seq[V]]]] = at[String] { key =>
-    params(key).as(dh, ct).map{
+    params(key).asText(dh, ct).map{
     case Nil => None
     case seq => Some(seq)
     }
   }
 
   implicit def extract[V](implicit
-   dh: Decode[V],
+   dh: Decode.TextPlain[String,V],
    ct: ClassTag[V]
   ): Case.Aux[String,ReqRead[V]] = at[String]{key =>
-   param(key).as(dh,ct)
+   param(key).asText(dh,ct)
+  }
+}
+
+/*
+object FromParamsExtract extends Poly1 {
+
+  implicit val asyncBuf: ReqRead[AsyncStream[Buf]] = asyncBody
+
+  implicit val cookieRR: Case.Aux[String,ReqRead[Cookie]] = at[String](key => cookie(key))
+
+  implicit val cookieRROption: Case.Aux[String,ReqRead[Option[Cookie]]] = at[String](key => cookieOption(key))
+
+  implicit def nested[Repr <: HList,V](implicit
+    gen: LabelledGeneric.Aux[V, Repr],
+    fp:  Lazy[FromParams[Repr]]
+  ): Case.Aux[String,ReqRead[V]] = at[String]{ key =>
+    derive[V].fromParams
+  }
+
+  implicit def nestedOption[Repr <: HList,V](implicit
+   gen: LabelledGeneric.Aux[V, Repr],
+   fp:  Lazy[FromParams[Repr]]
+   ): Case.Aux[String,ReqRead[Option[V]]] = at[String]{ key =>
+    derive[V].fromParams.lift
+  }
+
+  implicit def optionalExtract[V,CT <: String](implicit
+   dh: Decode.Aux[String,V,CT],
+   ct: ClassTag[V]
+  ): Case.Aux[String,ReqRead[Option[V]]] = at[String]{ key =>
+   paramOption(key).decode(dh,ct)
+   }
+
+  implicit def seqExtractor[V,CT <: String](implicit
+   dh: Decode.Aux[String,V,CT],
+   ct: ClassTag[V]
+  ): Case.Aux[String, ReqRead[Seq[V]]] = at[String] { key =>
+    paramsNonEmpty(key).decode(dh, ct)
+  }
+
+  implicit def seqExtractorOption[V,CT <: String](implicit
+   dh: Decode.Aux[String,V,CT],
+   ct: ClassTag[V]
+  ): Case.Aux[String, ReqRead[Option[Seq[V]]]] = at[String] { key =>
+    params(key).decode(dh, ct).map{
+    case Nil => None
+    case seq => Some(seq)
+    }
+  }
+
+  implicit def extract[V,CT <: String](implicit
+   dh: Decode.Aux[String,V,CT],
+   ct: ClassTag[V]
+  ): Case.Aux[String,ReqRead[V]] = at[String]{key =>
+   param(key).decode(dh,ct)
    }
 }
+ */
 
 object FromParams extends Cases {
 
