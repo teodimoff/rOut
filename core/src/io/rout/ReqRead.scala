@@ -1,12 +1,15 @@
 package io.rout
 
 import cats.data.Xor
+
 import scala.reflect.ClassTag
 import com.twitter.finagle.http.Request
+import com.twitter.io.Buf
 import com.twitter.util.{Future, Return, Throw, Try}
 import shapeless.{::, Generic, HList, HNil}
 import shapeless.ops.function.FnToProduct
 import shapeless.ops.hlist.Tupler
+
 import scala.language.higherKinds
 
 /**
@@ -194,7 +197,25 @@ object ReqRead {
    * The resulting reader will fail when type conversion fails.
    */
   implicit class StringReaderOps(val rr: ReqRead[String]) extends AnyVal {
-    def as[A](implicit decoder: Decode[A], tag: ClassTag[A]): ReqRead[A] =
+
+    def asText[A](implicit decoder: Decode.TextPlain[String,A], tag: ClassTag[A]): ReqRead[A] = decode
+
+    def asJson[A](implicit decoder: Decode.ApplicationJson[String,A], tag: ClassTag[A]): ReqRead[A] = decode
+
+
+    def decode[A,CT <: String](implicit decoder: Decode.Aux[String,A,CT], tag: ClassTag[A]): ReqRead[A] =
+      rr.embedFlatMap(value => decoder(value) match {
+        case Xor.Right(Return(r)) => Future.value(r)
+        case Xor.Right(Throw(t)) => Future.exception(t)
+        case Xor.Left(e) => Future.exception(e)
+      })
+  }
+
+  implicit class BufReaderOps(val rr: ReqRead[Buf]) extends AnyVal {
+
+    def asJson[A](implicit decoder: Decode.ApplicationJson[Buf,A], tag: ClassTag[A]): ReqRead[A] = decode(decoder,tag)
+
+    def decode[A,CT <: String](implicit decoder: Decode.Aux[Buf,A,CT], tag: ClassTag[A]): ReqRead[A] =
       rr.embedFlatMap(value => decoder(value) match {
         case Xor.Right(Return(r)) => Future.value(r)
         case Xor.Right(Throw(t)) => Future.exception(t)
@@ -210,12 +231,23 @@ object ReqRead {
    * result is empty or type conversion succeeds.
    */
   implicit class StringOptionReaderOps(val rr: ReqRead[Option[String]]) extends AnyVal {
-    def as[A](implicit decoder: Decode[A], tag: ClassTag[A]): ReqRead[Option[A]] = rr.embedFlatMap {
-      case Some(value) => decoder(value) match {
-        case Xor.Right(r) => Future.value(r.toOption)
-        case Xor.Left(e) => Future.None
+
+    def asText[A](implicit
+      decoder: Decode.TextPlain[String,A],
+      tag: ClassTag[A]): ReqRead[Option[A]] = decode
+
+    def asJson[A](implicit
+      decoder: Decode.ApplicationJson[String,A],
+      tag: ClassTag[A]): ReqRead[Option[A]] = decode
+
+    def decode[A,CT <: String](implicit
+      decoder: Decode.Aux[String,A,CT],
+      tag: ClassTag[A]): ReqRead[Option[A]] = rr.embedFlatMap {
+        case Some(value) => decoder(value) match {
+          case Xor.Right(r) => Future.value(r.toOption)
+          case Xor.Left(e) => Future.None
       }
-      case None => Future.None
+        case None => Future.None
     }
 
     private[rout] def noneIfEmpty: ReqRead[Option[String]] = rr.map {
@@ -233,9 +265,17 @@ object ReqRead {
    */
   implicit class StringSeqReaderOps(val rr: ReqRead[Seq[String]]) extends AnyVal{
 
-    def as[A](implicit decoder: Decode[A], tag: ClassTag[A]): ReqRead[Seq[A]] =
+    def asText[A](implicit
+      decoder: Decode.TextPlain[String,A],
+      tag: ClassTag[A]): ReqRead[Seq[A]] = decode
+
+    def asJson[A](implicit
+      decoder: Decode.ApplicationJson[String,A],
+      tag: ClassTag[A]): ReqRead[Seq[A]] = decode
+
+    def decode[A,CT <: String](implicit decoder: Decode.Aux[String,A,CT], tag: ClassTag[A]): ReqRead[Seq[A]] =
       rr.embedFlatMap { items =>
-        val converted = items.flatMap(x=> decoder.apply(x).toOption)
+        val converted = items.flatMap(x=> decoder(x).toOption)
         if (converted.forall(_.isReturn)) Future.value(converted.map(_.get))
         else Future.exception(Error.RequestErrors(converted.collect {
           case Throw(e) => Error.NotParsed(rr.item, tag, e)
