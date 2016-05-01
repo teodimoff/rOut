@@ -95,8 +95,8 @@ package object routing extends ReqReads {
     def embed(bfuture: ReqRead[Future[B]]): ReqRead[Future[A]] =
       rr.flatMap(ra => bfuture.map(ba => ba.map(x=> ra(x))))
 
-    def embed(paramName: String)(implicit dr: Decode[B],ct: ClassTag[B]): ReqRead[A] =
-      rr.flatMap(ra => param(paramName).as[B].map(ba => ra(ba)))
+    def embed(paramName: String)(implicit dr: Decode.TextPlain[String,B],ct: ClassTag[B]): ReqRead[A] =
+      rr.flatMap(ra => param(paramName).asText[B].map(ba => ra(ba)))
 
     def embed(b: B) = rr.map(_(b))
 
