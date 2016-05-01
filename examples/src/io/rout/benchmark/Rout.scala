@@ -4,7 +4,7 @@ import io.rout._
 import io.routs._
 import io.rout.generic.decoding._
 
-object Main extends App {
+object Rout extends App {
 
   val passportDerive = derive[Passport].fromParams
 
