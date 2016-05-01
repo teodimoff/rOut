@@ -10,5 +10,5 @@ Initial benchmark results:
 | Finch + Circe     | 25954.25 req/s | 26021.75 req/s | 25916.58 req/s |
 | rOut params	    | 24186.81 req/s | 24232.44 req/s | 24334.53 req/s |
 | rOut params + auth| 23795.24 req/s | 23701.54 req/s | 23688.66 req/s |
-| rOut circe soon   | 		     |		      |		       |
-| rOut circe + auth |		     | 		      | 	       |
+| rOut + Circe      | 26089.80 req/s | 26184.95	req/s | 26248.69 req/s |
+| rOut Circe + auth | 21729.74 req/s | 21668.75	req/s | 21681.65 req/s |
