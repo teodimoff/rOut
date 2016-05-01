@@ -132,7 +132,7 @@ trait ReqReads {
   /**
    * A [[ReqRead]] that reads a binary request body, interpreted as a `Array[Byte]`, into an `Option`.
    */
-  val binaryBodyOption: ReqRead[Option[Array[Byte]]] =
+  val binaryBodyOptionArray: ReqRead[Option[Array[Byte]]] =
     matches(BodyItem)(!_.isChunked)(req =>
     req.contentLength match {
       case Some(n) if n > 0 => Some(Buf.ByteArray.Shared.extract(req.content))
@@ -140,11 +140,22 @@ trait ReqReads {
     }
   )
 
+  val binaryBodyOption: ReqRead[Option[Buf]] =
+    matches(BodyItem)(!_.isChunked)(req =>
+      req.contentLength match {
+        case Some(n) if n > 0 => Some(req.content)
+        case _ => None
+      }
+    )
+
+  val binaryBody: ReqRead[Buf] = binaryBodyOption.failIfNone
+
+
   /**
    * A [[ReqRead]] that reads a required binary request body, interpreted as a `Array[Byte]`, or throws a
    * [[Error.NotPresent]] exception.
    */
-  val binaryBody: ReqRead[Array[Byte]] = binaryBodyOption.failIfNone
+  val binaryBodyArray: ReqRead[Array[Byte]] = binaryBodyOptionArray.failIfNone
 
   /**
    * A [[ReqRead]] that reads an optional request body, interpreted as a `String`, into an `Option`.
