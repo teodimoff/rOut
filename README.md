@@ -1,4 +1,6 @@
 # rOut
+
+[![Join the chat at https://gitter.im/teodimoff/rOut](https://badges.gitter.im/teodimoff/rOut.svg)](https://gitter.im/teodimoff/rOut?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Scala library for building Finagle HTTP services.
 This is a fork of https://github.com/finagle/finch which will aim to make it possible to use regular Filter and Services.
 
