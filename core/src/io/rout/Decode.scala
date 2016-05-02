@@ -1,11 +1,9 @@
 package io.rout
 
 import java.util.UUID
-
 import cats.data.Xor
 import com.twitter.util.{Eval, Try}
 import shapeless.{::, Generic, HNil, Witness}
-
 import scala.language.implicitConversions
 import scala.language.higherKinds
 import scala.reflect.ClassTag
@@ -113,3 +111,4 @@ object Decode extends LowPriorityDecodeInstances {
     if (s.length != 36) throw new IllegalArgumentException(s"Too long for UUID: ${s.length}")
     else UUID.fromString(s))
 }
+

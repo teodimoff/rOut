@@ -4,7 +4,7 @@ import cats.Show
 import cats.data.Xor
 import com.twitter.io.Buf
 import shapeless.Witness
-import   io.rout.contentTypes._
+import io.rout.contentTypes._
 import scalatags.Text.TypedTag
 
 /**
@@ -33,8 +33,8 @@ trait LowPriorityEncodeInstances {
   def json[A](fn: A => Buf): ApplicationJson[A] =
     instance[A, Application.Json](fn)
 
-  //def text[A](fn: A => Buf): TextHtml[A] =
-  //  instance[A, Text.Html](fn)
+  def textPlain[A](fn: A => Buf): TextPlain[A] =
+    instance[A, Text.Plain](fn)
 
   def html[A](fn: A => Buf): TextHtml[A] =
     instance[A, Text.Html](fn)
@@ -71,7 +71,7 @@ object Encode extends LowPriorityEncodeInstances {
   implicit val encodeString: TextHtml[String] =
     html(Buf.Utf8.apply)
 
-  implicit val enchtml: TextHtml[TypedTag[String]] = html(x=> Buf.Utf8(x.render))
+  implicit val encodehtml: TextHtml[TypedTag[String]] = html(x=> Buf.Utf8(x.render))
 
   implicit def encodeXor[A, B, CT <: String](implicit
     ae: Encode.Aux[A, CT],
