@@ -25,7 +25,7 @@ scala_library(name = 'benchmark-all',
      '3rdparty/jvm/com/twitter:twitter-server',
      'projects3/rOut/circe/src/io/rout/circe',
   ],
-    sources = globs('package.scala','Payload.scala','AuthFilter.scala','Benchmark.scala'),
+    sources = globs('*.scala'),
 )
 
 jvm_binary(name='binary',
