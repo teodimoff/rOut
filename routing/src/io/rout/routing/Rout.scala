@@ -74,9 +74,5 @@ trait Rout {
   def options[A,B](path: Path => Option[(B,Path)]) =
     PathToServiceOption[A,B](Method.Options,path,Future.value(notFound))
 
-  //serve static content eg. /css/bootstrap.css
-  def static(staticPath: String)(path: Path) =
-    get(path).service(req => FileOps.static(staticPath,Future(notFound)))
-
 }
 
