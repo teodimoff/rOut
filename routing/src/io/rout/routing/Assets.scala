@@ -16,14 +16,17 @@ case class Assets(file: FileOps, seq: Seq[RequestToService] = Nil)  {
   def asset2(assetPrefix: String) =  copy(file,seq :+get(Root / assetPrefix / path[String] / path[String]).service(r =>
     file.read(Path(r.path).drop(Path(assetPrefix).depth).toString).response(FNF)))
 
-  def asset3(assetPrefix: String) =  copy(file,seq :+get(Root / assetPrefix / path[String] / path[String] / path[String]).service(r =>
-    file.read(Path(r.path).drop(Path(assetPrefix).depth).toString).response(FNF)))
+  def asset3(assetPrefix: String) =  copy(file,seq :+
+    get(Root / assetPrefix / path[String] / path[String] / path[String]).service(r =>
+      file.read(Path(r.path).drop(Path(assetPrefix).depth).toString).response(FNF)))
 
-  def asset4(assetPrefix: String) =  copy(file,seq :+get(Root / assetPrefix / path[String] / path[String] / path[String] / path[String]).service(r =>
-    file.read(Path(r.path).drop(Path(assetPrefix).depth).toString).response(FNF)))
+  def asset4(assetPrefix: String) =  copy(file,seq :+
+    get(Root / assetPrefix / path[String] / path[String] / path[String] / path[String]).service(r =>
+      file.read(Path(r.path).drop(Path(assetPrefix).depth).toString).response(FNF)))
 
-  def asset5(assetPrefix: String) =  copy(file,seq :+get(Root / assetPrefix / path[String] / path[String] / path[String] / path[String] / path[String]).service(r =>
-    file.read(Path(r.path).drop(Path(assetPrefix).depth).toString).response(FNF)))
+  def asset5(assetPrefix: String) =  copy(file,seq :+
+    get(Root / assetPrefix / path[String] / path[String] / path[String] / path[String] / path[String]).service(r =>
+      file.read(Path(r.path).drop(Path(assetPrefix).depth).toString).response(FNF)))
 
   def debug: Assets = copy(file,seq ++ Assets.addDebug(file))
 
@@ -35,15 +38,20 @@ case class Assets(file: FileOps, seq: Seq[RequestToService] = Nil)  {
 
   def asset(assetPrefix: String, depth: Int) = depth match {
     case 1 =>
-      copy(file,seq ++ Seq(asset1(assetPrefix)).flatMap(_.seq))
+      copy(file,seq ++
+        Seq(asset1(assetPrefix)).flatMap(_.seq))
     case 2 =>
-      copy(file,seq ++ Seq(asset1(assetPrefix),asset2(assetPrefix)).flatMap(_.seq))
+      copy(file,seq ++
+        Seq(asset1(assetPrefix),asset2(assetPrefix)).flatMap(_.seq))
     case 3 =>
-      copy(file,seq ++ Seq(asset1(assetPrefix),asset2(assetPrefix),asset3(assetPrefix)).flatMap(_.seq))
+      copy(file,seq ++
+        Seq(asset1(assetPrefix),asset2(assetPrefix),asset3(assetPrefix)).flatMap(_.seq))
     case 4 =>
-      copy(file,seq ++ Seq(asset1(assetPrefix),asset2(assetPrefix),asset3(assetPrefix),asset4(assetPrefix)).flatMap(_.seq))
+      copy(file,seq ++
+        Seq(asset1(assetPrefix),asset2(assetPrefix),asset3(assetPrefix),asset4(assetPrefix)).flatMap(_.seq))
     case 5 =>
-      copy(file,seq ++ Seq(asset1(assetPrefix),asset2(assetPrefix),asset3(assetPrefix),asset4(assetPrefix),asset5(assetPrefix)).flatMap(_.seq))
+      copy(file,seq ++
+        Seq(asset1(assetPrefix),asset2(assetPrefix),asset3(assetPrefix),asset4(assetPrefix),asset5(assetPrefix)).flatMap(_.seq))
   }
 }
 object Assets  {
