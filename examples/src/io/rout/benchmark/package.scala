@@ -7,9 +7,7 @@ import com.twitter.util.Await
 import io.routs._
 import com.twitter.finagle.Service
 import com.twitter.finagle.http.{Request,Response}
-/**
-  * Created by betepahos on 30.04.16.
-  */
+
 package object benchmark {
 
   def serve(s: Service[Request,Response]) {

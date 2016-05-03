@@ -14,7 +14,7 @@ object Rout extends App {
 
   val rOut = mkRoutes(Seq(
     regularPayload
-  )).withNotFound("path was not found")
+  ))
 
   serve(rOut.service)
 }
@@ -29,7 +29,7 @@ object RoutAuth extends App {
 
   val rOut = mkRoutes(Seq(
     AuthFilter.auth andThen payload
-  )).withNotFound("path was not found")
+  ))
 
   serve(rOut.service)
 }

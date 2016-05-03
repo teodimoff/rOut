@@ -14,7 +14,16 @@ scala_library(name = 'benchmark-circe',
      '3rdparty/jvm/com/twitter:finagle-stats',
      'projects3/rOut/circe/src/io/rout/circe',
   ],
-    sources = globs('package.scala','Payload.scala','AuthFilter.scala','Circerout.scala'),
+    sources = globs('package.scala','Payload.scala','Circe.scala'),
+)
+
+scala_library(name = 'benchmark-circe-auth',
+  dependencies = [
+     '3rdparty/jvm/com/twitter:finagle-http',
+     '3rdparty/jvm/com/twitter:finagle-stats',
+     'projects3/rOut/circe/src/io/rout/circe',
+  ],
+    sources = globs('package.scala','Payload.scala','AuthFilter.scala','CirceAuth.scala'),
 )
 
 scala_library(name = 'benchmark-all',
@@ -38,7 +47,7 @@ jvm_binary(name='binary',
 
 jvm_binary(name='binary-circe',
   basename='rOut-benchmark-circe-app',
-  main='io.rout.benchmark.CircerOut',
+  main='io.rout.benchmark.Circe',
   dependencies=[
   ':benchmark-circe'
   ]
