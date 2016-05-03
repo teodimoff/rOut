@@ -7,9 +7,7 @@ import io.rout.path.Path
 import shapeless.Lazy
 import scala.reflect.ClassTag
 
-package object routing extends ReqReads {
-
- // val async = io.rout.asyncBody.toFilter
+package object routing extends ReqReads with Rout {
 
   implicit class FilterOps[A](val filter: Filter[Request, Response,A, Response]) extends AnyVal {
     def joinPath[B](path: Path => Option[(B,Path)]) = new Filter[Request, Response,Option[(A,B)], Response] {

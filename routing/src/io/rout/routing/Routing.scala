@@ -4,40 +4,19 @@ package io.rout.routing
 import com.twitter.finagle.Service
 import com.twitter.finagle.http._
 import com.twitter.util.{Future, StorageUnit}
-import io.rout.file.FileOps
 import com.twitter.conversions.storage._
 
 case class Routing(seq: Seq[RequestToService],FNF: Future[Response]) {
 
-  lazy val fileCache = withCacheSize()
+  def :+(add: Seq[RequestToService]): Routing = copy(seq ++ add, FNF)
 
-  def :+(add: Seq[RequestToService]): Routing =
-     Routing(seq ++ add, FNF)
+  def :+(add: RequestToService): Routing = copy(seq :+ add, FNF)
 
-  def :+(add: RequestToService): Routing =
-     Routing(seq :+ add, FNF)
+  def fileService(cacheSize: StorageUnit = 50.megabytes) = Assets(cacheSize).+:(seq)
 
-  def asset1(prefix: String) =
-     Routing(seq :+ Assets(prefix,fileCache).asset1,FNF)
+  def fileService(cacheSize: String): Assets = fileService(StorageUnit.parse(cacheSize))
 
-  def asset2(prefix: String) =
-     Routing(seq :+ Assets(prefix,fileCache).asset2,FNF)
-
-  def asset3(prefix: String) =
-     Routing(seq :+ Assets(prefix,fileCache).asset3,FNF)
-
-  def asset4(prefix: String) =
-     Routing(seq :+ Assets(prefix,fileCache).asset4,FNF)
-
-  def asset5(prefix: String) =
-     Routing(seq :+ Assets(prefix,fileCache).asset5,FNF)
-
-  def asset(prefix: String,depth: Int) =
-     Routing(seq ++ Assets(prefix,fileCache).assetDepth(depth),FNF)
-
-  def debugAssets = Routing(seq ++ Assets("",fileCache).addDebug(),FNF)
-
-  def withCacheSize(size: StorageUnit = 50.megabyte) = FileOps(size)
+  def add(assets: Assets) = :+(assets.seq)
 
   def withNotFound(html: String): Routing = {
     val response = Response(Status.NotFound)

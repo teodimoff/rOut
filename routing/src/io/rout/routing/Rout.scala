@@ -3,7 +3,6 @@ package io.rout.routing
 import com.twitter.finagle.http._
 import com.twitter.logging.{Level, Logger}
 import com.twitter.util.Future
-import io.rout.file.FileOps
 import io.rout.path.{MatchPath, Path, Root => RootPath}
 
 trait Rout {
@@ -15,11 +14,11 @@ trait Rout {
             futureNotFound: Future[Response] = Future.value(notFound)
            ) = mkRoutes(seq,futureNotFound)
 
-  def mkRoutes(seq: Seq[RequestToService], fnd: Future[Response] = Future.value(notFound)) =
-    new Routing(seq,fnd)
+  def mkRoutes(seq: Seq[RequestToService], FNF: Future[Response] = Future.value(notFound)) =
+     Routing(seq,FNF)
 
-  def mkRoutable(seq: Seq[Routable], futureNotFound: Future[Response] = Future.value(notFound)) =
-    new Routing(seq.flatMap(_.routes),futureNotFound)
+  def mkRoutable(seq: Seq[Routable], FNF: Future[Response] = Future.value(notFound)) =
+     Routing(seq.flatMap(_.routes),FNF)
 
   def path[A] = MatchPath[A] _
 
