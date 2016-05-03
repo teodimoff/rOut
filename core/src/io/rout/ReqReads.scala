@@ -140,6 +140,9 @@ trait ReqReads {
     }
   )
 
+  /**
+    * A [[ReqRead]] that reads a binary request body, interpreted as a `Buf`, into an `Option`.
+    */
   val binaryBodyOption: ReqRead[Option[Buf]] =
     matches(BodyItem)(!_.isChunked)(req =>
       req.contentLength match {
@@ -148,6 +151,10 @@ trait ReqReads {
       }
     )
 
+  /**
+    * A [[ReqRead]] that reads a required binary request body, interpreted as a `Buf`, or throws a
+    * [[Error.NotPresent]] exception.
+    */
   val binaryBody: ReqRead[Buf] = binaryBodyOption.failIfNone
 
 
