@@ -8,35 +8,33 @@ import io.circe.generic.auto._
 
 object Benchmark extends App {
 
-  val body = binaryBody.asJson[Payload]
+  val jsonPayload = binaryBody.asJson[Payload]
 
-  val passportDerive = derive[Passport].fromParams
+  val paramsPayload: ReqRead[Payload] = derive[Payload].fromParams
 
-  val derivedPayload: ReqRead[Payload] = derive[Payload].fromParams
-
-  val payloadParams = post(Root / "params")(derivedPayload) { payload =>
+  val payloadParams = post(Root / "params")(paramsPayload) { payload =>
     Created(payload.toString)
   }
 
-  val payloadParamsAuth = post(Root / "params" / "auth").filter[AuthedReq,Payload](derivedPayload) { (auth, payload) =>
+  val payloadParamsAuth = post(Root / "params" / "auth").filter[AuthedReq,Payload](paramsPayload) { (auth, payload) =>
     Created(payload.toString)
   }
 
   val payloadParamsPathAuth =
-    post(Root / "params" / "auth" / Match[String]).filter[AuthedReq,Payload](derivedPayload) { (auth, string, payload) =>
+    post(Root / "params" / "auth" / Match[String]).filter[AuthedReq,Payload](paramsPayload) { (auth, string, payload) =>
       Created(payload.toString)
     }
 
-  val payloadJsonAuth = post(Root / "json" / "auth").filter[AuthedReq,Payload](body) { (auth, payload) =>
+  val payloadJsonAuth = post(Root / "json" / "auth").filter[AuthedReq,Payload](jsonPayload) { (auth, payload) =>
     Created(payload)
   }
 
   val payloadJsonPathAuth =
-    post(Root / "json" / "auth" / Match[String]).filter[AuthedReq,Payload](body) { (auth, string, payload) =>
-    Created(payload.toString)
+    post(Root / "json" / "auth" / Match[String]).filter[AuthedReq,Payload](jsonPayload) { (auth, string, payload) =>
+    Created(payload)
   }
 
-  val payloadJson = post(Root / "json")(body)(p => Ok(p))
+  val payloadJson = post(Root / "json")(jsonPayload)(p => Ok(p))
 
   val rOut = mkRoutes(Seq(
     payloadParams,

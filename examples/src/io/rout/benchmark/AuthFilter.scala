@@ -6,6 +6,7 @@ import com.twitter.util.Future
 import io.rout.ReqExt
 
 import scala.collection.mutable
+import scala.util.Random
 
 case class Passport(name: String,age: Int,password: String)
 
@@ -46,5 +47,5 @@ object PassportDatabase {
   def save(t: Passport): Unit = synchronized { db += (t.password -> t) }
   def delete(password: String): Unit = synchronized { db -= password }
 
-  save(Passport("Teo",27,"1d2a409b"))
+  save(Passport(Random.nextString(5),Random.nextInt(30),"1d2a409b"))
 }

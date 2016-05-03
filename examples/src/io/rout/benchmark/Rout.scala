@@ -6,7 +6,20 @@ import io.rout.generic.decoding._
 
 object Rout extends App {
 
-  val passportDerive = derive[Passport].fromParams
+  val derivedPayload: ReqRead[Payload] = derive[Payload].fromParams
+
+  val regularPayload = post(Root)(derivedPayload) { payload =>
+    Created(payload.toString)
+  }
+
+  val rOut = mkRoutes(Seq(
+    regularPayload
+  )).withNotFound("path was not found")
+
+  serve(rOut.service)
+}
+
+object RoutAuth extends App {
 
   val derivedPayload: ReqRead[Payload] = derive[Payload].fromParams
 
@@ -14,19 +27,8 @@ object Rout extends App {
     Created(payload.toString)
   }
 
-  val payloadPath =
-    post(Root / "auth" / Match[String]).filter[AuthedReq,Payload](derivedPayload) { (auth, string, payload) =>
-    Created(payload.toString)
-  }
-
-  val regularPayload = post(Root)(derivedPayload) { payload =>
-    Created(payload.toString)
-  }
-
   val rOut = mkRoutes(Seq(
-    regularPayload,
-    AuthFilter.auth andThen payload,
-    AuthFilter.auth andThen payloadPath
+    AuthFilter.auth andThen payload
   )).withNotFound("path was not found")
 
   serve(rOut.service)
