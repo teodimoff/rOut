@@ -5,6 +5,8 @@ import cats.data.Xor
 import com.twitter.io.Buf
 import shapeless.Witness
 import io.rout.contentTypes._
+
+import scala.xml.NodeSeq
 import scalatags.Text.TypedTag
 
 /**
@@ -21,6 +23,7 @@ trait LowPriorityEncodeInstances {
   type Aux[A, CT <: String] = Encode[A] { type ContentType = CT }
 
   type ApplicationJson[A] = Aux[A, Application.Json]
+  type ApplicationXml[A] = Aux[A, Application.Xml]
   type TextHtml[A] = Aux[A, Text.Html]
   type TextPlain[A] = Aux[A, Text.Plain]
 
@@ -29,6 +32,9 @@ trait LowPriorityEncodeInstances {
       type ContentType = CT
       def apply(a: A): Buf = fn(a)
     }
+
+  def xml[A](fn: A => Buf): ApplicationXml[A] =
+    instance[A, Application.Xml](fn)
 
   def json[A](fn: A => Buf): ApplicationJson[A] =
     instance[A, Application.Json](fn)
@@ -68,10 +74,15 @@ object Encode extends LowPriorityEncodeInstances {
   implicit val encodeExceptionAsJson: ApplicationJson[Exception] =
     json(e => Buf.Utf8(s"""{"message": "${Option(e.getMessage).getOrElse("")}""""))
 
+  implicit val encodeExceptionXml: ApplicationXml[Exception] =
+    xml(e => Buf.Utf8(Option(e.getMessage).getOrElse("")))
+
   implicit val encodeString: TextHtml[String] =
     html(Buf.Utf8.apply)
 
   implicit val encodehtml: TextHtml[TypedTag[String]] = html(x=> Buf.Utf8(x.render))
+
+  implicit val encodeXml: ApplicationXml[NodeSeq] = xml(x=> Buf.Utf8(x.toString()))
 
   implicit def encodeXor[A, B, CT <: String](implicit
     ae: Encode.Aux[A, CT],
