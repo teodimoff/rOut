@@ -35,7 +35,7 @@ object Main extends TwitterServer {
     }
   }
 
-  val todo = post(Root / "todo").filter[AuthedReq](derivedTodo) { (auth, todo) =>
+  val todo = post(Root / "todo").filter[AuthedReq,Todo](derivedTodo) { (auth, todo) =>
     todos.incr()
     Todo.save(todo)
     Created(s"User ${auth.passport.name.capitalize} Created -> ${todo.toString}")

@@ -7,10 +7,9 @@ import io.circe.generic.auto._
 
 object Circe extends App {
 
-  val body = binaryBody.asJson[Payload]
-  
-  val payloadJson = post(Root)(body)(payload => Ok(payload))
+  val bodyPayload = binaryBody.asJson[Payload]
+
+  val payloadJson = post(Root)(bodyPayload)(payload => Ok(payload))
 
   serve(mkRoutes(Seq(payloadJson)).service)
-
 }

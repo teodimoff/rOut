@@ -72,7 +72,7 @@ object Main extends TwitterServer {
     Created(todo.toString)
   }
 
-  val postTodoRpc = post(Root / "todo" / "rpc")(rpcTodo){todo =>
+  val postTodoRpc = post(Root / "todo" / "rpc")(rpcTodo) {todo =>
     todos.incr()
     Todo.save(todo)
     Created(todo.toString)
@@ -133,8 +133,10 @@ object Main extends TwitterServer {
     optionsTodo
     //patchedTodo
   ))
+    .fileService()
     .asset("a",3)
-    .debugAssets
+    .debug
+    .done
     .withNotFound("path was not found")
 
   def main(){

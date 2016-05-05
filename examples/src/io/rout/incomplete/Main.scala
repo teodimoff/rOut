@@ -87,8 +87,10 @@ object Main extends TwitterServer {
     deleteTodos,
     deleteTodo
   ))
+    .fileService()
     .asset("a",3)
-    .debugAssets
+    .debug
+    .done
     .withNotFound("path was not found")
 
   def main(): Unit = {
