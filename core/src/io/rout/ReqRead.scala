@@ -62,6 +62,12 @@ trait ReqRead[A] { self =>
   }
 
   /**
+    * Joins this request reader with rrb.
+    */
+  def join[B](rrb:ReqRead[B]):ReqRead[(A,B)] =
+    self.flatMap(ra=> rrb.map(ba => ra -> ba))
+
+  /**
    * Flat-maps this request reader to the given function `A => Future[B]`.
    */
   def embedFlatMap[B](fn: A => Future[B]): ReqRead[B] = new ReqRead[B] {
@@ -202,6 +208,7 @@ object ReqRead {
 
     def asJson[A](implicit decoder: Decode.ApplicationJson[String,A], tag: ClassTag[A]): ReqRead[A] = decode
 
+    def asXml[A](implicit decoder: Decode.ApplicationXml[String,A], tag: ClassTag[A]): ReqRead[A] = decode
 
     def decode[A,CT <: String](implicit decoder: Decode.Aux[String,A,CT], tag: ClassTag[A]): ReqRead[A] =
       rr.embedFlatMap(value => decoder(value) match {
