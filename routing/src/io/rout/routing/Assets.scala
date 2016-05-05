@@ -10,23 +10,23 @@ case class Assets(file: FileOps, seq: Seq[RequestToService] = Nil)  {
   import Assets._
   private val FNF = Future(notFound)
 
-  def asset1(assetPrefix: String) = copy(file,seq :+ get(Root / assetPrefix / path[String]).service(r =>
-    file.read(Path(r.path).drop(Path(assetPrefix).depth).toString).response(FNF)))
+  def asset1(ap: String) = copy(file,seq :+ get(Root / ap / path[String]).service(r =>
+    file.read(Path(r.path).drop(Path(ap).depth).toString).response(FNF)))
 
-  def asset2(assetPrefix: String) =  copy(file,seq :+get(Root / assetPrefix / path[String] / path[String]).service(r =>
-    file.read(Path(r.path).drop(Path(assetPrefix).depth).toString).response(FNF)))
+  def asset2(ap: String) =  copy(file,seq :+get(Root / ap / path[String] / path[String]).service(r =>
+    file.read(Path(r.path).drop(Path(ap).depth).toString).response(FNF)))
 
-  def asset3(assetPrefix: String) =  copy(file,seq :+
-    get(Root / assetPrefix / path[String] / path[String] / path[String]).service(r =>
-      file.read(Path(r.path).drop(Path(assetPrefix).depth).toString).response(FNF)))
+  def asset3(ap: String) =  copy(file,seq :+
+    get(Root / ap / path[String] / path[String] / path[String]).service(r =>
+      file.read(Path(r.path).drop(Path(ap).depth).toString).response(FNF)))
 
-  def asset4(assetPrefix: String) =  copy(file,seq :+
-    get(Root / assetPrefix / path[String] / path[String] / path[String] / path[String]).service(r =>
-      file.read(Path(r.path).drop(Path(assetPrefix).depth).toString).response(FNF)))
+  def asset4(ap: String) =  copy(file,seq :+
+    get(Root / ap / path[String] / path[String] / path[String] / path[String]).service(r =>
+      file.read(Path(r.path).drop(Path(ap).depth).toString).response(FNF)))
 
-  def asset5(assetPrefix: String) =  copy(file,seq :+
-    get(Root / assetPrefix / path[String] / path[String] / path[String] / path[String] / path[String]).service(r =>
-      file.read(Path(r.path).drop(Path(assetPrefix).depth).toString).response(FNF)))
+  def asset5(ap: String) =  copy(file,seq :+
+    get(Root / ap / path[String] / path[String] / path[String] / path[String] / path[String]).service(r =>
+      file.read(Path(r.path).drop(Path(ap).depth).toString).response(FNF)))
 
   def debug: Assets = copy(file,seq ++ Assets.addDebug(file))
 
@@ -36,24 +36,25 @@ case class Assets(file: FileOps, seq: Seq[RequestToService] = Nil)  {
 
   def done = Routing(seq,FNF)
 
-  def asset(assetPrefix: String, depth: Int) = depth match {
+  def asset(ap: String, depth: Int) = depth match {
     case 1 =>
       copy(file,seq ++
-        Seq(asset1(assetPrefix)).flatMap(_.seq))
+        Seq(asset1(ap)).flatMap(_.seq))
     case 2 =>
       copy(file,seq ++
-        Seq(asset1(assetPrefix),asset2(assetPrefix)).flatMap(_.seq))
+        Seq(asset1(ap),asset2(ap)).flatMap(_.seq))
     case 3 =>
       copy(file,seq ++
-        Seq(asset1(assetPrefix),asset2(assetPrefix),asset3(assetPrefix)).flatMap(_.seq))
+        Seq(asset1(ap),asset2(ap),asset3(ap)).flatMap(_.seq))
     case 4 =>
       copy(file,seq ++
-        Seq(asset1(assetPrefix),asset2(assetPrefix),asset3(assetPrefix),asset4(assetPrefix)).flatMap(_.seq))
+        Seq(asset1(ap),asset2(ap),asset3(ap),asset4(ap)).flatMap(_.seq))
     case 5 =>
       copy(file,seq ++
-        Seq(asset1(assetPrefix),asset2(assetPrefix),asset3(assetPrefix),asset4(assetPrefix),asset5(assetPrefix)).flatMap(_.seq))
+        Seq(asset1(ap),asset2(ap),asset3(ap),asset4(ap),asset5(ap)).flatMap(_.seq))
   }
 }
+
 object Assets  {
   //use path param to read file from local filesystem eq :8080/local/pic.jpg?path=/home/teodimoff/
   def addDebug(file: FileOps) = Seq(
