@@ -1,14 +1,12 @@
 package io.rout.generic.decoding
 
-import com.twitter.concurrent.AsyncStream
-import com.twitter.io.Buf
+
 import shapeless.labelled._
 import shapeless._
-
 import scala.reflect.ClassTag
 import scala.language.implicitConversions
 import scala.language.higherKinds
-import com.twitter.finagle.http.{Cookie, Request}
+import com.twitter.finagle.http.Cookie
 import io.rout._
 
 /**
@@ -20,6 +18,10 @@ trait FromParams[L <: HList] {
 }
 
 object FromParamsExtract extends Poly1 {
+
+   case class FromMap[K,V](key: K, value: V){
+    def toMap = Map[K,V](key -> value)
+  }
 
   implicit val cookieRR: Case.Aux[String,ReqRead[Cookie]] = at[String](key => cookie(key))
 
@@ -44,6 +46,20 @@ object FromParamsExtract extends Poly1 {
    ct: ClassTag[V]
   ): Case.Aux[String,ReqRead[Option[V]]] = at[String]{ key =>
    paramOption(key).asText(dh,ct)
+  }
+
+  implicit def map[Repr <: HList,K,V](implicit
+    gen: LabelledGeneric.Aux[FromMap[K,V], Repr],
+    fp:  Lazy[FromParams[Repr]]
+  ): Case.Aux[String,ReqRead[Map[K,V]]] = at[String]{ key =>
+    derive[FromMap[K,V]].fromParams.map(_.toMap)
+  }
+
+  implicit def mapOption[Repr <: HList,K,V](implicit
+    gen: LabelledGeneric.Aux[FromMap[K,V], Repr],
+    fp:  Lazy[FromParams[Repr]]
+  ): Case.Aux[String,ReqRead[Option[Map[K,V]]]] = at[String]{ key =>
+    derive[FromMap[K,V]].fromParams.map(_.toMap).lift
   }
 
   implicit def seqExtractor[V](implicit
