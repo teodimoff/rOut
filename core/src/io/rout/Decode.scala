@@ -7,7 +7,7 @@ import shapeless.{::, Generic, HNil, Witness}
 import scala.language.implicitConversions
 import scala.language.higherKinds
 import scala.reflect.ClassTag
-
+import io.rout.contentTypes._
 /**
  * An abstraction that is responsible for decoding the request of type `A`.
  */
@@ -21,9 +21,11 @@ trait LowPriorityDecodeInstances {
 
   type Aux[I,A,CT <: String] = Decode[I,A]{ type ContentType = CT }
 
-  type ApplicationJson[I,A] = Aux[I,A,Witness.`"application/json"`.T]
+  type ApplicationJson[I,A] = Aux[I,A,Application.Json]
 
-  type TextPlain[I,A] = Aux[I,A,Witness.`"text/plain"`.T]
+  type ApplicationXml[I,A] = Aux[I,A,Application.Xml]
+
+  type TextPlain[I,A] = Aux[I,A,Text.Plain]
 
   /**
    * Creates an instance for a given type.
@@ -34,11 +36,13 @@ trait LowPriorityDecodeInstances {
   }
 
   def applicationJson[I,A](fn: I => Decode.Result[A]): ApplicationJson[I,A] =
-    instance[I,A,Witness.`"application/json"`.T](fn)
+    instance[I,A,Application.Json](fn)
 
+  def applicationXml[I,A](fn: I => Decode.Result[A]): ApplicationXml[I,A] =
+    instance[I,A,Application.Xml](fn)
 
   def textPlain[I,A](fn: I => Decode.Result[A]): TextPlain[I,A] =
-    instance[I,A,Witness.`"text/plain"`.T](fn)
+    instance[I,A,Text.Plain](fn)
 
   /**
    * Creates a [[Decode]] from [[shapeless.Generic]].
