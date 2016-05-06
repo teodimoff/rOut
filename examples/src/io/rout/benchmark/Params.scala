@@ -4,7 +4,7 @@ import io.rout._
 import io.routs._
 import io.rout.generic.decoding._
 
-object Rout extends App {
+object Params extends App {
 
   val derivedPayload: ReqRead[Payload] = derive[Payload].fromParams
 
@@ -19,7 +19,7 @@ object Rout extends App {
   serve(rOut.service)
 }
 
-object RoutAuth extends App {
+object ParamsAuth extends App {
 
   val derivedPayload: ReqRead[Payload] = derive[Payload].fromParams
 

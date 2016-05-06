@@ -1,12 +1,12 @@
 package io.rout.example.xml
 
-import io.rout._
-import io.routs._
-import io.rout.xml._
-import cats._
-import implicits._
 
 object Main extends App {
+  import io.rout._
+  import io.routs._
+  import io.rout.xml._
+  import cats._
+  import implicits._
 
   val bodyXml = body.asXml[Payload]
 
@@ -16,35 +16,25 @@ object Main extends App {
 
 }
 
-/*
-import cats.data.Xor
-import com.twitter.util.Try
-import io.rout._
-import io.routs._
-import cats._
-import implicits._
-import io.rout.generic.xml.semiauto._
+object Semiauto extends App {
+  import io.rout._
+  import io.routs._
+  import cats._
+  import implicits._
+  import io.rout.generic.xml.semiauto._
 
-import io.rout.example.xml._
+   val decoder = decode[Payload]
 
-object Main extends App {
+  val encoder = encode[Payload]
 
-   val decode = derive[Payload].xmlDecoder
+  implicit val e = encoder.encodeXml
 
-   val encode = derive[Payload].xmlEncoder
-
-  implicit val cc: Decode.ApplicationXml[String,Payload] =
-    Decode.applicationXml(p => decode.fromXmlString(p).fold[Xor[Error,Try[Payload]]](
-      err => Xor.Left(Error(err.getMessage)),
-      value => Xor.Right(Try(value))
-    ))
+  implicit val d = decoder.decodeXml
 
   val bodyXml = body.asXml[Payload]
 
-  val xmlPayload = post(Root)(bodyXml)(payload => Ok(encode.toXml(payload)))
+  val xmlPayload = post(Root)(bodyXml)(payload => Ok(payload))
 
   serve(mkRoutes(Seq(xmlPayload)).service)
 
 }
-
- */
