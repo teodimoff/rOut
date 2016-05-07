@@ -3,6 +3,7 @@ package io.rout.generic.decoding
 
 import shapeless.labelled._
 import shapeless._
+
 import scala.reflect.ClassTag
 import scala.language.implicitConversions
 import scala.language.higherKinds
@@ -19,8 +20,8 @@ trait FromParams[L <: HList] {
 
 object FromParamsExtract extends Poly1 {
 
-   case class FromMap[K,V](key: K, value: V){
-    def toMap = Map[K,V](key -> value)
+   case class FromMap[K,V](key: Seq[K], value: Seq[V]){
+    def toMap = (key zip value).toMap
   }
 
   implicit val cookieRR: Case.Aux[String,ReqRead[Cookie]] = at[String](key => cookie(key))
