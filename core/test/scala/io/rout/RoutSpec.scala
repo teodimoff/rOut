@@ -8,14 +8,8 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.prop.Checkers
 import org.scalatest.{FlatSpec, Matchers}
 import org.typelevel.discipline.Laws
-import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest.prop.Checkers
-import org.scalatest.{FlatSpec, Matchers}
-import org.typelevel.discipline.Laws
-import algebra.Eq
 import cats.std.AllInstances
 import org.junit.runner.RunWith
-import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])

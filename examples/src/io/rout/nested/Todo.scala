@@ -3,7 +3,7 @@ package io.rout.nested
 import scala.collection.mutable
 
 
-case class Todo(id: Int, title: String, completed: Boolean, order: Option[Int], extraInfo: ExtraInfo)
+case class Todo(id: Int, title: String, completed: Boolean, order: Option[Int], extraInfo: ExtraInfo,map: Map[String,Int])
 
 case class ExtraInfo(daysToComplete: Int,relatedTodos: Option[Seq[Int]], advisor: Option[String])
 
