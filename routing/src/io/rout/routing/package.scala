@@ -1,3 +1,4 @@
+/*
 package io.rout
 
 import io.rout.routing.{Assets, Routing}
@@ -39,3 +40,5 @@ package object file {
   */
 
 }
+
+ */

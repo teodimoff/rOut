@@ -9,19 +9,19 @@ import shapeless.Lazy
 
 case class PathToService[A](m: Method,path: Path){
 
-  case class filter[B,AA](rr: ReqRead[AA]){
-    def apply[C,CT <:String](service: (B,AA) => Output[C])
-                            (implicit tr: ToResponse.Aux[Output[C],CT]) = {
-      (filter: Filter[Request,Response,ReqExt[B],Response]) =>
-        RequestToService(reqFn(m, path),
-          Service.mk(filter.andThen(rr.toFilter2[B]) andThen service.tupled.andThen(x=> Future(tr(x)))))
-    }
-  }
+  object filter { def apply[B] = new filter[B] {} }
 
-  case class filter1[AA]() {
-   def apply[B,CT <:String](service:  AA => Output[B])(implicit tr: ToResponse.Aux[Output[B],CT] ) =
-     (filter: Filter[Request,Response,ReqExt[AA],Response]) =>
-       RequestToService(reqFn(m,path),Service.mk(filter.andThen(aa=> service.andThen(x=> Future(tr(x)))(aa.value))))
+  trait filter[B]{
+    def apply[AA,C,CT <:String](rr: ReqRead[AA])(service: (B,AA) => Output[C])(
+      implicit tr: ToResponse.Aux[Output[C],CT]) = {
+        (filter: Filter[Request,Response,ReqExt[B],Response]) => RequestToService(
+          reqFn(m, path), Service.mk(filter.andThen(rr.toFilter2[B]) andThen service.tupled.andThen(x=> Future(tr(x)))))
+    }
+
+    def apply[AA,CT <:String](service:  B => Output[AA])(
+      implicit tr: ToResponse.Aux[Output[AA],CT] ) =
+      (filter: Filter[Request,Response,ReqExt[B],Response]) => RequestToService(
+        reqFn(m,path),Service.mk(filter.andThen(aa=> service.andThen(x=> Future(tr(x)))(aa.value))))
   }
 
   private def reqFn(method: Method,path: Path): Request => Boolean = (request: Request) =>
@@ -56,29 +56,29 @@ case class PathToService[A](m: Method,path: Path){
 
 case class PathToServiceOption[A,B](m: Method,path: Path => Option[(B,Path)],notFound: Future[Response]) {
 
-  case class filter[AA,CC](rr: ReqRead[CC]){
-    def apply[D,CT <:String](service: (AA,B,CC) => Output[D])
-                            (implicit tr: ToResponse.Aux[Output[D],CT]) = {
-      (filter: Filter[Request,Response,ReqExt[AA],Response]) =>
-        RequestToService(reqFn(m, Path(path)),
-          Service.mk(filter.andThen(rr.toFilter.joinPath2[B,AA](path)).andThen(abo =>
+  object filter{ def apply[AA] = new filter[AA] {} }
+
+  trait filter[AA]{
+    def apply[CC,D,CT <:String](rr: ReqRead[CC])(service: (AA,B,CC) => Output[D])(
+      implicit tr: ToResponse.Aux[Output[D],CT]) = {
+        (filter: Filter[Request,Response,ReqExt[AA],Response]) => RequestToService(
+          reqFn(m, Path(path)), Service.mk(filter.andThen(rr.toFilter.joinPath2[B,AA](path)).andThen(abo =>
             abo match {
               case None => notFound
               case Some((a,c,b)) => Future(tr(service(a,b,c)))
             }
           )))
     }
-  }
-  case class filter1[AA]() {
-    def apply[C, CT <: String](service: (AA,B) => Output[C])
-                              (implicit tr: ToResponse.Aux[Output[C], CT]) = {
-      (filter: Filter[Request,Response,ReqExt[AA],Response]) =>
-      RequestToService(reqFn(m, Path(path)), Service.mk(filter.joinPath[B](path).andThen(abo =>
-        abo match {
-          case None => notFound
-          case Some((reqExt, path_)) => Future(tr(service(reqExt.value,path_)))
-        }
-      )))
+
+    def apply[C, CT <: String](service: (AA,B) => Output[C])(
+      implicit tr: ToResponse.Aux[Output[C], CT]) = {
+        (filter: Filter[Request,Response,ReqExt[AA],Response]) => RequestToService(
+          reqFn(m, Path(path)), Service.mk(filter.joinPath[B](path).andThen(abo =>
+           abo match {
+              case None => notFound
+             case Some((reqExt, path_)) => Future(tr(service(reqExt.value,path_)))
+           }
+        )))
     }
   }
 

@@ -132,5 +132,5 @@ package object routing extends ReqReads with Rout {
     def swapFlat: Future[Option[A]] = future map (_.flatten)
   }
 
-
 }
+
