@@ -213,7 +213,7 @@ object ReqRead {
     def decode[A,CT <: String](implicit decoder: Decode.Aux[String,A,CT], tag: ClassTag[A]): ReqRead[A] =
       rr.embedFlatMap(value => decoder(value) match {
         case Xor.Right(Return(r)) => Future.value(r)
-        case Xor.Right(Throw(t)) => Future.exception(t)
+        case Xor.Right(Throw(t)) => Future.exception(Error.NotParsed(rr.item,tag,t))
         case Xor.Left(e) => Future.exception(e)
       })
   }
@@ -225,7 +225,7 @@ object ReqRead {
     def decode[A,CT <: String](implicit decoder: Decode.Aux[Buf,A,CT], tag: ClassTag[A]): ReqRead[A] =
       rr.embedFlatMap(value => decoder(value) match {
         case Xor.Right(Return(r)) => Future.value(r)
-        case Xor.Right(Throw(t)) => Future.exception(t)
+        case Xor.Right(Throw(t)) => Future.exception(Error.NotParsed(rr.item,tag,t))
         case Xor.Left(e) => Future.exception(e)
       })
   }
