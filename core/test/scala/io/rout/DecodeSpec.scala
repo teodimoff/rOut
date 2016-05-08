@@ -6,9 +6,7 @@ import com.twitter.util.{Await, Return, Try}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.math._
-import scala.reflect.ClassTag
 import org.junit.runner.RunWith
-import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
@@ -21,7 +19,7 @@ class DecodeSpec extends FlatSpec with Matchers {
       def apply(s: String): Decode.Result[BigDecimal] = Xor.Right(Try(BigDecimal(s)))
     }
 
-    decode[BigDecimal]("12345.25") shouldBe Return(BigDecimal(12345.25))
+    decode[BigDecimal]("12345.25") shouldBe Xor.Right(Return(BigDecimal(12345.25)))
   }
   
   "A ReqRead for a String" should "allow for type conversions based on implicit Decode" in {
@@ -45,11 +43,11 @@ class DecodeSpec extends FlatSpec with Matchers {
     Await.result(result) shouldBe Some(5)
   }
   
-  it should "fail if a type conversions for an optional value fails" in {
+  it should "be None if a type conversions for an optional value fails" in {
     val request: Request = Request(("foo", "foo"))
     val reader: ReqRead[Option[Int]] = paramOption("foo").asText[Int]
     val result = reader(request)
-    Await.result(result.liftToTry).isThrow shouldBe true
+    None shouldBe Await.result(result)
   }
   
   it should "skip type conversion and succeed if the optional value is missing" in {

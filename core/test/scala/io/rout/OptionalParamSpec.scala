@@ -4,7 +4,6 @@ import com.twitter.finagle.http.Request
 import com.twitter.util.{Await, Future}
 import org.scalatest.{FlatSpec, Matchers}
 import org.junit.runner.RunWith
-import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
@@ -58,10 +57,10 @@ class OptionalParamSpec extends FlatSpec with Matchers {
     Await.result(futureResult) shouldBe Some(true)
   }
 
-  it should "produce an error if the param is not a number" in {
+  it should "produce an None if the param is not a number" in {
     val request: Request = Request(("foo", "non-boolean"))
     val futureResult: Future[Option[Boolean]] = paramOption("foo").asText[Boolean].apply(request)
-    an [Error.NotParsed] shouldBe thrownBy(Await.result(futureResult))
+    None shouldBe Await.result(futureResult)
   }
 
 
@@ -71,10 +70,10 @@ class OptionalParamSpec extends FlatSpec with Matchers {
     Await.result(futureResult) shouldBe Some(5)
   }
 
-  it should "produce an error if the param is not a number" in {
+  it should "produce an None if the param is not a number" in {
     val request: Request = Request(("foo", "non-number"))
     val futureResult: Future[Option[Int]] = paramOption("foo").asText[Int].apply(request)
-    an [Error.NotParsed] shouldBe thrownBy(Await.result(futureResult))
+    None shouldBe Await.result(futureResult)
   }
 
 
@@ -84,10 +83,10 @@ class OptionalParamSpec extends FlatSpec with Matchers {
     Await.result(futureResult) shouldBe Some(9000000000000000L)
   }
 
-  it should "produce an error if the param is not a number" in {
+  it should "produce an None if the param is not a number" in {
     val request: Request = Request(("foo", "non-number"))
     val futureResult: Future[Option[Long]] = paramOption("foo").asText[Long].apply(request)
-    an [Error.NotParsed] shouldBe thrownBy(Await.result(futureResult))
+    None shouldBe Await.result(futureResult)
   }
 
   "An OptionalFloatParam" should "be parsed as a double" in {
@@ -96,10 +95,10 @@ class OptionalParamSpec extends FlatSpec with Matchers {
     Await.result(futureResult) shouldBe Some(5.123f)
   }
 
-  it should "produce an error if the param is not a number" in {
+  it should "produce an None if the param is not a number" in {
     val request: Request = Request(("foo", "non-number"))
     val futureResult: Future[Option[Float]] = paramOption("foo").asText[Float].apply(request)
-    an [Error.NotParsed] shouldBe thrownBy(Await.result(futureResult))
+    None shouldBe Await.result(futureResult)
   }
 
   "An OptionalDoubleParam" should "be parsed as a float" in {
@@ -108,9 +107,9 @@ class OptionalParamSpec extends FlatSpec with Matchers {
     Await.result(futureResult) shouldBe Some(100.0)
   }
 
-  it should "produce an error if the param is not a number" in {
+  it should "produce an None if the param is not a number" in {
     val request: Request = Request(("foo", "non-number"))
     val futureResult: Future[Option[Double]] = paramOption("foo").asText[Double].apply(request)
-    an [Error.NotParsed] shouldBe thrownBy(Await.result(futureResult))
+    None shouldBe Await.result(futureResult)
   }
 }

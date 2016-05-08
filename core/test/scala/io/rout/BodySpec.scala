@@ -5,7 +5,6 @@ import com.twitter.finagle.http.Request
 import com.twitter.io.Buf
 import com.twitter.util._
 import org.junit.runner.RunWith
-import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
@@ -14,7 +13,7 @@ class BodySpec extends RoutSpec {
   "A body reader" should "read the optional HTTP body as a string" in {
     check { req: Request =>
       val cs = req.contentString
-      val bo = Await.result(binaryBodyOptionArray(req))
+      val bo = Await.result(bodyOption(req))
       (cs.isEmpty && bo === None) || (cs.nonEmpty && bo === Some(cs))
     }
   }

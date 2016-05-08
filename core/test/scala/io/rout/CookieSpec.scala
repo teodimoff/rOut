@@ -5,7 +5,6 @@ import com.twitter.finagle.http.{Cookie, Request}
 import com.twitter.util.{Await, Future}
 import org.scalatest.{FlatSpec, Matchers}
 import org.junit.runner.RunWith
-import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])

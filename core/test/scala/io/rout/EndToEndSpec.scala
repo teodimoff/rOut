@@ -1,12 +1,9 @@
 package io.rout
 
 import cats.data.Xor
-import com.twitter.finagle.Service
-import com.twitter.finagle.http.{Request, Response, Status}
 import com.twitter.io.Buf
 import com.twitter.util.{Await, Return, Try}
 import org.junit.runner.RunWith
-import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])

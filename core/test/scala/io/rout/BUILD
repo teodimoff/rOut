@@ -1,5 +1,6 @@
-scala_library(name = 'rout',
+junit_tests(name = 'rout',
   dependencies = [
+     ':resources',
      '3rdparty:junit',
      '3rdparty/jvm/org/typelevel:cats-core',
      '3rdparty/jvm/org/typelevel:cats-laws',
@@ -12,4 +13,10 @@ scala_library(name = 'rout',
      'projects3/rOut/core/src/io:rout',
   ],
     sources = globs('*.scala','internal/*.scala'),
+)
+
+scala_library(name = 'resources',
+   resources = [
+   'projects3/rOut/core/test/resources:upload',
+   ],
 )

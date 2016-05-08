@@ -7,7 +7,6 @@ import cats.Show
 import com.twitter.io.Buf
 import com.twitter.util.{Return, Throw, Try}
 import org.junit.runner.RunWith
-import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 /**
