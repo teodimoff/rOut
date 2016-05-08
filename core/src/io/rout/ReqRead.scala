@@ -21,8 +21,8 @@ import scala.language.higherKinds
  * {{{
  *   case class Complex(r: Double, i: Double)
  *   val complex: ReqRead[Complex] = (
- *     param("real").as[Double] ::
- *     paramOption("imaginary").as[Double].withDefault(0.0)
+ *     param("real").asText[Double] ::
+ *     paramOption("imaginary").as[Double].default(0.0)
  *   ).as[Complex]
  * }}}
  *
@@ -78,9 +78,9 @@ trait ReqRead[A] { self =>
   /**
    * Applies the given filter `p` to this request reader.
    */
-  def withFilter(p: A => Boolean): ReqRead[A] = self.should("not fail validation")(p)
+  def filter(p: A => Boolean): ReqRead[A] = self.should("not fail validation")(p)
 
-  def filterF(p: A => Future[Boolean]): ReqRead[A] = self.shouldF("not fail validation")(p)
+  def filterf(p: A => Future[Boolean]): ReqRead[A] = self.shouldF("not fail validation")(p)
 
   /**
    * Lifts this request reader into one that always succeeds, with an empty option representing failure.
@@ -304,7 +304,7 @@ object ReqRead {
     /**
      * If reader is empty it will return provided default value
      */
-    def withDefault[B >: A](default: => B): ReqRead[B] = rr.map(_.getOrElse(default))
+    def default[B >: A](default: => B): ReqRead[B] = rr.map(_.getOrElse(default))
 
     /**
      * If reader is empty it will return provided alternative

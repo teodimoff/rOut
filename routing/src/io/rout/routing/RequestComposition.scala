@@ -9,7 +9,9 @@ import shapeless.Lazy
 
 case class PathToService[A](m: Method,path: Path){
 
-  object filter { def apply[B] = new filter[B] {} }
+  //object filter { def apply[B] = new filter[B] {} }
+
+  def filter[B] = new filter[B] {}
 
   trait filter[B]{
     def apply[AA,C,CT <:String](rr: ReqRead[AA])(service: (B,AA) => Output[C])(
@@ -56,7 +58,9 @@ case class PathToService[A](m: Method,path: Path){
 
 case class PathToServiceOption[A,B](m: Method,path: Path => Option[(B,Path)],notFound: Future[Response]) {
 
-  object filter{ def apply[AA] = new filter[AA] {} }
+  //object filter{ def apply[AA] = new filter[AA] {} }
+
+  def filter[AA] = new filter[AA] {}
 
   trait filter[AA]{
     def apply[CC,D,CT <:String](rr: ReqRead[CC])(service: (AA,B,CC) => Output[D])(
