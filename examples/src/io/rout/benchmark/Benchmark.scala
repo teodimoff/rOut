@@ -16,21 +16,21 @@ object Benchmark extends App {
     Created(payload.toString)
   }
 
-  val payloadParamsAuth = post(Root / "params" / "auth").filter[AuthedReq,Payload](paramsPayload) { (auth, payload) =>
+  val payloadParamsAuth = post(Root / "params" / "auth").filter[AuthedReq](paramsPayload) { (auth, payload) =>
     Created(payload.toString)
   }
 
   val payloadParamsPathAuth =
-    post(Root / "params" / "auth" / Match[String]).filter[AuthedReq,Payload](paramsPayload) { (auth, string, payload) =>
+    post(Root / "params" / "auth" / Match[String]).filter[AuthedReq](paramsPayload) { (auth, string, payload) =>
       Created(payload.toString)
     }
 
-  val payloadJsonAuth = post(Root / "json" / "auth").filter[AuthedReq,Payload](jsonPayload) { (auth, payload) =>
+  val payloadJsonAuth = post(Root / "json" / "auth").filter[AuthedReq](jsonPayload) { (auth, payload) =>
     Created(payload)
   }
 
   val payloadJsonPathAuth =
-    post(Root / "json" / "auth" / Match[String]).filter[AuthedReq,Payload](jsonPayload) { (auth, string, payload) =>
+    post(Root / "json" / "auth" / Match[String]).filter[AuthedReq](jsonPayload) { (auth, string, payload) =>
     Created(payload)
   }
 

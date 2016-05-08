@@ -9,7 +9,7 @@ object CirceAuth extends App {
 
   val body = binaryBody.asJson[Payload]
 
-  val payloadAuth = post(Root).filter[AuthedReq,Payload](body) { (auth, payload) =>
+  val payloadAuth = post(Root).filter[AuthedReq](body) { (auth, payload) =>
     Created(payload)
   }
 

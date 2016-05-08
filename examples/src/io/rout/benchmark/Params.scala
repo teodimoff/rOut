@@ -18,18 +18,3 @@ object Params extends App {
 
   serve(rOut.service)
 }
-
-object ParamsAuth extends App {
-
-  val derivedPayload: ReqRead[Payload] = derive[Payload].fromParams
-
-  val payload = post(Root / "auth").filter[AuthedReq](derivedPayload) { (auth, payload) =>
-    Created(payload.toString)
-  }
-
-  val rOut = mkRoutes(Seq(
-    AuthFilter.auth andThen payload
-  ))
-
-  serve(rOut.service)
-}
