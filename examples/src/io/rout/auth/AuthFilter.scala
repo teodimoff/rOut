@@ -31,7 +31,7 @@ object AuthFilter {
 
 object AuthService {
   val authService = Service.mk[Request,AuthResult] { req =>
-    req.params.get("password").flatMap(pass => PassportDatabase.get(pass)) match {
+    req.cookies.get("password").flatMap(pass => PassportDatabase.get(pass.value)) match {
       case Some(passport) => Future(AuthResult(AuthResultCode.OK,Some(passport)))
       case None => Future(AuthResult(AuthResultCode.Fail,None))
     }

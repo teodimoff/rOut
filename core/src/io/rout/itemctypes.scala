@@ -2,7 +2,7 @@ package io.rout
 
 import shapeless.Witness
 
-package object contentTypes {
+object contentTypes {
   object Application {
     type Json = Witness.`"application/json"`.T
     type Xml = Witness.`"application/xml"`.T
@@ -21,7 +21,6 @@ package object contentTypes {
 
 
 }
-
 
 /**
   * Representations for the various types that can be processed with [[ReqRead]]s.

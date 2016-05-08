@@ -10,9 +10,7 @@ import io.rout._
 import io.routs._
 import io.rout.generic.decoding._
 import rOut.examples.src.io.rout.auth._
-
 import scala.util.Random
-
 
 object Main extends TwitterServer {
 
@@ -26,22 +24,22 @@ object Main extends TwitterServer {
 
   val derivedTodo: ReqRead[Todo] = derive[Int => Todo].incomplete.map(_(Random.nextInt(100000)))
 
-  val getTodos = get(Root / "todos").filter1[AuthedReq]()(r => Ok(Todo.list().mkString("\n")))
+  val getTodos = get(Root / "todos").filter[AuthedReq](r => Ok(Todo.list().mkString("\n")))
 
-  val getTodo = get(Root / "todo" / Match[Int]).filter1[AuthedReq](){ (auth, id) =>
+  val getTodo = get(Root / "todo" / Match[Int]).filter[AuthedReq]{ (auth, id) =>
     Todo.get(id) match {
       case Some(t) => Todo.delete(id); Ok(t.toString)
       case None => throw new TodoNotFound(id)
     }
   }
 
-  val todo = post(Root / "todo").filter[AuthedReq,Todo](derivedTodo) { (auth, todo) =>
+  val todo = post(Root / "todo").filter[AuthedReq](derivedTodo) { (auth, todo) =>
     todos.incr()
     Todo.save(todo)
     Created(s"User ${auth.passport.name.capitalize} Created -> ${todo.toString}")
   }
 
-  val todoPath = post(Root / "todo" / Match[String]).filter[AuthedReq,Todo](derivedTodo) { (auth, string, todo) =>
+  val todoPath = post(Root / "todo" / Match[String]).filter[AuthedReq](derivedTodo) { (auth, string, todo) =>
     todos.incr()
     Todo.save(todo)
     Created(s"User ${auth.passport.name.toUpperCase} Created -> ${todo.toString}")

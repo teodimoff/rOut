@@ -13,7 +13,27 @@ import io.rout.generic.decoding._
 
 import scala.util.Random
 
-
+/*
+ *for options you need to set Origin header and with Access-Control-Request-Method:POST or Get etc...
+ *e.g (with httpie)
+ * http options :8081/todo Origin:localhost:8081 Access-Control-Request-Method:POST --verbose
+ *
+ *OPTIONS /test?name=eee&age=4 HTTP/1.1
+ *Accept: *//*
+ *Accept-Encoding: gzip, deflate, compress
+ *Access-Control-Request-Method: POST
+ *Content-Length: 0
+ *Host: localhost:8081
+ *Origin: http://localhost:8081
+ *User-Agent: HTTPie/0.8.0
+ *
+ *HTTP/1.1 200 OK
+ *Access-Control-Allow-Headers: x-requested-with
+ *Access-Control-Allow-Methods: POST
+ *Access-Control-Allow-Origin: *
+ *Content-Length: 0
+ *Vary: Origin
+ */
 object Main extends TwitterServer {
 
   val port: Flag[Int] = flag("port", 8081, "TCP port for HTTP server")
@@ -31,28 +51,6 @@ object Main extends TwitterServer {
 
   val rpcTodo: ReqRead[Future[Todo]] =
     derivedTodo.map(todo => rpcId.map(todo.apply))
-
-    /*
-   *for options you need to set Origin header and with Access-Control-Request-Method:POST or Get etc...
-   *e.g (with httpie)
-   * http options :8081/todo Origin:localhost:8081 Access-Control-Request-Method:POST --verbose
-   *
-   *OPTIONS /test?name=eee&age=4 HTTP/1.1
-   *Accept: *//*
-   *Accept-Encoding: gzip, deflate, compress
-   *Access-Control-Request-Method: POST
-   *Content-Length: 0
-   *Host: localhost:8081
-   *Origin: http://localhost:8081
-   *User-Agent: HTTPie/0.8.0
-   *
-   *HTTP/1.1 200 OK
-   *Access-Control-Allow-Headers: x-requested-with
-   *Access-Control-Allow-Methods: POST
-   *Access-Control-Allow-Origin: *
-   *Content-Length: 0
-   *Vary: Origin
-  */
 
   val optionsTodo = options(Root / "todo")(o =>Ok("todo"))
 

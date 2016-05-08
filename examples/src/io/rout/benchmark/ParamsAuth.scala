@@ -8,7 +8,7 @@ object ParamsAuth extends App {
 
   val derivedPayload: ReqRead[Payload] = derive[Payload].fromParams
 
-  val payload = post(Root).filter[AuthedReq,Payload](derivedPayload) { (auth, payload) =>
+  val payload = post(Root).filter[AuthedReq](derivedPayload) { (auth, payload) =>
     Created(payload.toString)
   }
 
