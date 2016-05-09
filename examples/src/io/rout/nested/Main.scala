@@ -10,6 +10,7 @@ import com.twitter.util.{Await, Future}
 import io.rout._
 import io.routs._
 import io.rout.generic.decoding._
+import io.rout.routing.Routable
 
 import scala.util.Random
 
@@ -119,7 +120,7 @@ object Main extends TwitterServer {
   }
  */
 
-  val rOut = mkRoutes(Seq(
+  val rOut = mkRoutable(Seq(
     getTodo,
     getTodos,
     postTodo,
@@ -128,7 +129,8 @@ object Main extends TwitterServer {
     postTodoComplete,
     deleteTodos,
     deleteTodo,
-    optionsTodo
+    optionsTodo,
+    Xx
     //patchedTodo
   ))
     .fileService()
@@ -148,4 +150,14 @@ object Main extends TwitterServer {
 
     Await.ready(adminHttpServer)
   }
+}
+
+object Xx extends Routable {
+
+  val xx1 = get(Root / "x")(r => Ok("this is ok"))
+
+  val xx2 = get(Root / "x" / Match[String])(r => Ok("this is ok too"))
+
+  val routes = Seq(xx1,xx2)
+
 }
