@@ -65,7 +65,7 @@ object Decode extends LowPriorityDecodeInstances {
       d: Decode.Aux[I,A,CT]): Decode.Aux[I,A,CT] = d
   }
 
-  implicit def decodeEnum[I,A](implicit ct: ClassTag[A]): Decode[String,(A with Enumeration)#Value] = tryDecode(s =>
+  implicit def decodeEnum[I,A](implicit ct: ClassTag[A]): Decode.TextPlain[String,(A with Enumeration)#Value] = tryDecode(s =>
     (new Eval).inPlace[A with Enumeration](ct.runtimeClass.getCanonicalName.dropRight(1)).withName(s))
 
   private def tryDecode[I,A](f: I => A): Decode.TextPlain[I,A] =
