@@ -95,6 +95,12 @@ case class PathToServiceOption[A,B](m: Method,path: Path => Option[(B,Path)],not
   def service(service: Request => Future[Response]) =
     RequestToService(reqFn(m, Path(path)), Service.mk(service))
 
+  def fromPath(service: B => Future[Response]) =
+    RequestToService(reqFn(m, Path(path)), Service.mk(path.toFilter.andThen(abo => abo match {
+      case None => notFound
+      case Some(b) => service(b._1)
+    })))
+
   def service(rr: Lazy[ReqRead[A]])(service: (B,A) => Future[Response]) =
     RequestToService(reqFn(m, Path(path)), Service.mk(rr.value.toFilter.joinPath[B](path).andThen(abo => abo match {
       case None => notFound
@@ -146,7 +152,10 @@ case class PathToServiceOption[A,B](m: Method,path: Path => Option[(B,Path)],not
   }
 }
 
-case class RequestToService(request: Request => Boolean,service: Service[Request,Response]) {
+case class RequestToService(request: Request => Boolean,service: Service[Request,Response]) extends  Routable{ self =>
+
+  val routes = Seq(self)
+
   def filter(filter: Filter[Request,Response,Request,Response]) =
     copy(service = filter andThen service)
 
