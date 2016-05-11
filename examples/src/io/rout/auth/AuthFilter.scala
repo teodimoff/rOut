@@ -1,7 +1,8 @@
 package rOut.examples.src.io.rout.auth
 
-import com.twitter.finagle.{Filter, Service, ServiceException}
+import com.twitter.finagle.{Filter, Service}
 import com.twitter.finagle.http.{Request, Response}
+//import com.twitter.finagle.tracing.Trace
 import com.twitter.util.Future
 import io.rout.ReqExt
 
@@ -11,7 +12,7 @@ case class Passport(name: String,age: Int,password: String)
 
 case class AuthResult(resultCode: AuthResultCode.Value,passport: Option[Passport])
 
-case class RequestUnauthenticated(authResultCode: AuthResultCode.Value) extends ServiceException
+case class RequestUnauthenticated(authResultCode: AuthResultCode.Value) extends Exception
 
 object AuthResultCode extends Enumeration {
   val OK,Fail = Value
@@ -24,6 +25,7 @@ object AuthFilter {
     AuthService.authService(request).flatMap {
       case AuthResult(AuthResultCode.OK, Some(passport)) => service(AuthedReq(request,passport))
       case authResult: AuthResult =>
+//        Trace.record("authentication failed with " + authResult)
         Future.exception(new RequestUnauthenticated(authResult.resultCode))
       }
     }

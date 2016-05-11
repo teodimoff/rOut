@@ -76,6 +76,11 @@ object Main extends TwitterServer {
     deleteRegistered
   ))
     .withNotFound("path was not found")
+    .handle{
+      case r:RequestUnauthenticated =>
+        Status.Ok -> s"<html> <a>Not Authenticated - ${r.authResultCode}</a></html>"
+    }
+
 
   def main(): Unit = {
     log.info("Serving the Todo Incompletes application (extract from request params)")
