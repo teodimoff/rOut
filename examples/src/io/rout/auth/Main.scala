@@ -9,7 +9,6 @@ import com.twitter.util.{Await, Future}
 import io.rout._
 import io.routs._
 import io.rout.generic.decoding._
-import rOut.examples.src.io.rout.auth._
 import scala.util.Random
 
 object Main extends TwitterServer {
@@ -76,9 +75,10 @@ object Main extends TwitterServer {
     deleteRegistered
   ))
     .withNotFound("path was not found")
-    .handle{
-      case r:RequestUnauthenticated =>
-        Status.Ok -> s"<html> <a>Not Authenticated - ${r.authResultCode}</a></html>"
+    .handle {
+      case t: TodoNotFound => Status.NotFound -> t.toString
+      case rua: RequestUnauthenticated => Status.Ok -> s"Authentication - ${rua.authResultCode}"
+      case t: Throwable => Status.BadRequest -> s"Bad Request ${t.fillInStackTrace().toString}"
     }
 
 
