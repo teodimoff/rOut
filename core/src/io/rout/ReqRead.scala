@@ -80,7 +80,8 @@ trait ReqRead[A] { self =>
    */
   def filter(p: A => Boolean): ReqRead[A] = self.should("not fail validation")(p)
 
-  def filterf(p: A => Future[Boolean]): ReqRead[A] = self.shouldF("not fail validation")(p)
+  //use filter implicit conversion
+  private def filterf(p: A => Future[Boolean]): ReqRead[A] = self.shouldF("not fail validation")(p)
 
   /**
    * Lifts this request reader into one that always succeeds, with an empty option representing failure.
@@ -95,8 +96,7 @@ trait ReqRead[A] { self =>
    *
    * @param rule text describing the rule being validated
    * @param predicate returns true if the data is valid
-   *
-   * @return a request reader that will return the value of this reader if it is valid.
+    * @return a request reader that will return the value of this reader if it is valid.
    *         Otherwise the future fails with an [[Error.NotValid]] error.
    */
   def should(rule: String)(predicate: A => Boolean): ReqRead[A] = embedFlatMap(a =>
@@ -114,8 +114,7 @@ trait ReqRead[A] { self =>
    *
    * @param rule text describing the rule being validated
    * @param predicate returns false if the data is valid
-   *
-   * @return a request reader that will return the value of this reader if it is valid.
+    * @return a request reader that will return the value of this reader if it is valid.
    *         Otherwise the future fails with a [[Error.NotValid]] error.
    */
   def shouldNot(rule: String)(predicate: A => Boolean): ReqRead[A] = should(s"not $rule.")(x => !predicate(x))
@@ -126,8 +125,7 @@ trait ReqRead[A] { self =>
    *
    * @param rule the predefined [[ValidationRule]] that will return true if the data is
    *             valid
-   *
-   * @return a request reader that will return the value of this reader if it is valid.
+    * @return a request reader that will return the value of this reader if it is valid.
    *         Otherwise the future fails with an [[Error.NotValid]] error.
    */
   def should[B](rule: ValidationRule[A]): ReqRead[A] = should(rule.description)(rule.apply)
@@ -138,8 +136,7 @@ trait ReqRead[A] { self =>
    *
    * @param rule the predefined [[ValidationRule]] that will return false if the data is
    *             valid
-   *
-   * @return a request reader that will return the value of this reader if it is valid.
+    * @return a request reader that will return the value of this reader if it is valid.
    *         Otherwise the future fails with a [[Error.NotValid]] error.
    */
   def shouldNot(rule: ValidationRule[A]): ReqRead[A] = shouldNot(rule.description)(rule.apply)
@@ -310,6 +307,10 @@ object ReqRead {
      * If reader is empty it will return provided alternative
      */
     def orElse[B >: A](alternative: => Option[B]): ReqRead[Option[B]] = rr.map(_.orElse(alternative))
+  }
+
+  implicit class ReqReadFutureOps[A](val rr: ReqRead[Future[A]]) extends AnyVal {
+    def filterf(f: A => Boolean) = rr.filterf(a => a.map(f))
   }
 
   /**
