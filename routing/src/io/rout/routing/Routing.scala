@@ -1,12 +1,12 @@
 package io.rout.routing
 
-
 import com.twitter.finagle.Service
 import com.twitter.finagle.http._
 import com.twitter.util.{Future, StorageUnit}
 import com.twitter.conversions.storage._
+import io.rout.ToResponse
 
-case class Routing(seq: Seq[RequestToService],FNF: Future[Response]) {
+case class Routing(seq: Seq[RequestToService],FNF: Future[Response],exc: ExceptionFilter = ExcFilter()) {
 
   def :+(add: Seq[RequestToService]): Routing = copy(seq ++ add, FNF)
 
@@ -25,6 +25,11 @@ case class Routing(seq: Seq[RequestToService],FNF: Future[Response]) {
      Routing(seq,Future(response))
   }
 
+  def handle[CT <: String](fn: PartialFunction[Throwable,(Status,String)]=
+                           PartialFunction.empty[Throwable,(Status,String)],
+                           globalMessage: String = "")(implicit tr: ToResponse.Aux[ExcpFn,CT]) =
+    Routing(seq,FNF,ExcFilter[CT](fn.andThen(ss => ExcpFn(ss._1,ss._2))))
+
   def matchRequest(seq: Seq[RequestToService],request: Request): Future[Response] = {
     def x1x(rem: Seq[RequestToService]): Future[Response] = rem match {
       case Nil =>  FNF
@@ -36,6 +41,8 @@ case class Routing(seq: Seq[RequestToService],FNF: Future[Response]) {
     x1x(seq)
   }
 
-  def service =  ExceptionFilter andThen Service.mk[Request,Response](request => matchRequest(seq,request))
+  //def service =  ExceptionFilter andThen Service.mk[Request,Response](request => matchRequest(seq,request))
+
+  def service = exc andThen Service.mk[Request,Response](request => matchRequest(seq,request))
 
 }
