@@ -1,6 +1,6 @@
 package io.rout.routing
 
-import com.twitter.finagle.Service
+import com.twitter.finagle.{Filter, Service}
 import com.twitter.finagle.http._
 import com.twitter.util.{Future, StorageUnit}
 import com.twitter.conversions.storage._
@@ -15,6 +15,8 @@ case class Routing(seq: Seq[RequestToService],FNF: Future[Response],exc: Excepti
   def fileService(cacheSize: StorageUnit = 50.megabytes) = Assets(cacheSize).+:(seq)
 
   def fileService(cacheSize: String): Assets = fileService(StorageUnit.parse(cacheSize))
+
+  def chainToAll(filter: Filter[Request,Response,Request,Response]) = seq.map(_.filter(filter))
 
   def add(assets: Assets) = :+(assets.seq)
 

@@ -7,9 +7,6 @@ import io.rout.ToResponse
 case class ExcpFn(status: Status,message: String)
 
 object ExcFilter {
-
-
-
   def apply[CT<: String](fn: PartialFunction[Throwable,ExcpFn] =
                          PartialFunction.empty[Throwable,ExcpFn])(implicit tr: ToResponse.Aux[ExcpFn,CT]) =
     ExceptionFilter(fn)(tr.apply)
