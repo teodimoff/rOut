@@ -14,6 +14,5 @@ package object rout extends Outputs with ReqReads with ValidationRules {
     def andThen(f: Filter[Request,Response,ReqExt[A],Response] => RequestToService): RequestToService = f(filter)
   }
 }
-//umm.... why nailgun crashes if extend rout with Rout?
-//try with sbt later
+//rout package conflicts with path and routing
 object routs extends Rout

@@ -1,4 +1,5 @@
-package io.rout.auth
+package io.rout.example.auth
+
 
 import com.twitter.app.Flag
 import com.twitter.finagle.Http

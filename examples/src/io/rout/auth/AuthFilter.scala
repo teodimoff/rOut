@@ -1,4 +1,4 @@
-package io.rout.auth
+package io.rout.example.auth
 
 import com.twitter.finagle.{Filter, Service}
 import com.twitter.finagle.http.{Request, Response}

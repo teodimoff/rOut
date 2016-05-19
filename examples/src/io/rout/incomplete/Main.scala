@@ -1,4 +1,4 @@
-package io.rout.incomplete
+package io.rout.example.incomplete
 
 import com.twitter.app.Flag
 import com.twitter.finagle.Http
@@ -29,6 +29,10 @@ object Main extends TwitterServer {
 
   val rpcTodo: ReqRead[Future[Todo]] =
     derivedTodo.map(todo => rpcId.map(todo.apply))
+      .filterf(todo =>
+        todo.id > 0 &&
+        todo.daysToComplete < 30 &&
+        !todo.completed)
 
   val getTodo = get(Root / "todo" / Match[Int]) { id =>
     Todo.get(id) match {
@@ -92,6 +96,9 @@ object Main extends TwitterServer {
     .debug
     .done
     .withNotFound("path was not found")
+    .handle{
+      case e: Exception => Status.NotFound -> e.getMessage
+    }
 
   def main(): Unit = {
     log.info("Serving the Todo Incompletes application (extract from request params)")

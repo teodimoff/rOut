@@ -26,7 +26,7 @@ case class Routing(seq: Seq[RequestToService],FNF: Future[Response],exc: Excepti
     response.contentString = html
      Routing(seq,Future(response))
   }
-
+//todo: make it work with abstract type A so we can take advantage of encoding
   def handle[CT <: String](fn: PartialFunction[Throwable,(Status,String)] =
                            PartialFunction.empty[Throwable,(Status,String)])(implicit tr: ToResponse.Aux[ExcpFn,CT]) =
     Routing(seq,FNF,ExcFilter[CT](fn.andThen(ss => ExcpFn(ss._1,ss._2))))

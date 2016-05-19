@@ -1,4 +1,4 @@
-package io.rout
+package io.rout.example
 
 import com.twitter.finagle.Http
 import com.twitter.finagle.stats.NullStatsReceiver

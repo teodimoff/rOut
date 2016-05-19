@@ -1,4 +1,4 @@
-package io.rout.benchmark
+package io.rout.example.benchmark
 
 import io.rout._
 import io.routs._

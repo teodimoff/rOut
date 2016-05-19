@@ -1,4 +1,4 @@
-package io.rout.incomplete
+package io.rout.example.incomplete
 
 import scala.collection.mutable
 
