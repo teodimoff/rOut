@@ -2,7 +2,7 @@ package io.rout
 
 import com.twitter.concurrent.AsyncStream
 import com.twitter.finagle.http.{Response, Status, Version}
-import com.twitter.io.Buf
+import com.twitter.io.{Buf, Charsets}
 import shapeless._
 import io.rout.contentTypes._
 /**

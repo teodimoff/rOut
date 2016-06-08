@@ -83,6 +83,8 @@ trait ReqRead[A] { self =>
   //use filter implicit conversion
   private def filterf(p: A => Future[Boolean]): ReqRead[A] = self.shouldF("not fail validation")(p)
 
+  private def shouldf(rule: String)(p: A => Future[Boolean]): ReqRead[A] = self.shouldF(rule)(p)
+
   /**
    * Lifts this request reader into one that always succeeds, with an empty option representing failure.
    */
@@ -118,6 +120,10 @@ trait ReqRead[A] { self =>
    *         Otherwise the future fails with a [[Error.NotValid]] error.
    */
   def shouldNot(rule: String)(predicate: A => Boolean): ReqRead[A] = should(s"not $rule.")(x => !predicate(x))
+
+  def shouldNotF(rule: String)(predicate: A => Future[Boolean]): ReqRead[A] =
+    shouldF(s"not $rule.")(x => predicate(x).map(b=> !b))
+
 
   /**
    * Validates the result of this request reader using a predefined `rule`. This method allows for rules to be reused
@@ -311,6 +317,11 @@ object ReqRead {
 
   implicit class ReqReadFutureOps[A](val rr: ReqRead[Future[A]]) extends AnyVal {
     def filterf(f: A => Boolean) = rr.filterf(a => a.map(f))
+
+    def must(rule: String)(f: A => Boolean) = rr.shouldf(rule)(a => a.map(f))
+
+    def mustNot(rule: String)(f: A => Boolean) = rr.shouldNotF(rule)(a => a.map(f))
+
   }
 
   /**

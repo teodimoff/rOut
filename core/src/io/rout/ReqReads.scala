@@ -102,11 +102,12 @@ trait ReqReads {
   def params(name: String): ReqRead[Seq[String]] =
     rr(ParamItem(name))(requestParams(name)(_).filter(_.nonEmpty))
 
-  def paramFn[A](name: String)(f: String => Future[Option[A]]
-  ):ReqRead[Future[Option[A]]] = param(name).map(f)
+  def paramFn[A,C[_]](name: String)(f: String => C[A]):ReqRead[C[A]] = param(name).map(f)
 
-  def paramsFn[A](name: String)(f: Seq[String] => Future[Option[Seq[A]]]
-  ):ReqRead[Future[Option[Seq[A]]]] = params(name).map(f)
+  //def paramsFn[A](name: String)(f: Seq[String] => Future[Option[Seq[A]]]
+  //):ReqRead[Future[Option[Seq[A]]]] = params(name).map(f)
+
+  def paramsFn[A,C[_]](name: String)(f: Seq[String] => C[A]):ReqRead[C[A]] = params(name).map(f)
 
   /**
    * Creates a [[ReqRead]] that reads a required HTTP header `name` from the request or raises an

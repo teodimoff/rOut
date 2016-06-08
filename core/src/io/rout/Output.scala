@@ -72,6 +72,9 @@ sealed trait Output[+A] { self =>
   def withHeader(header: (String, String)): Output[A] =
     withMeta(meta.copy(headers = headers + header))
 
+  def withHeaders(header: Seq[(String, String)]): Output[A] =
+    withMeta(meta.copy(headers = headers ++ header))
+
   /**
    * Adds a given `cookie` to this [[Output]].
    */

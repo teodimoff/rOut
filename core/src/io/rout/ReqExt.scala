@@ -9,5 +9,4 @@ import com.twitter.finagle.http.Request
 trait ReqExt[A] {self: A =>
   def value: A = self
   def request: Request
-
 }

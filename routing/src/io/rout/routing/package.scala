@@ -2,7 +2,6 @@ package io.rout
 
 import com.twitter.finagle.{Filter, Service}
 import com.twitter.finagle.http.{Request, Response}
-import com.twitter.io.Buf
 import com.twitter.util.Future
 import io.rout.path.Path
 import shapeless.Lazy
@@ -10,9 +9,6 @@ import shapeless.Lazy
 import scala.reflect.ClassTag
 
 package object routing extends ReqReads with Rout {
-
-  implicit val encodeException: Encode.TextHtml[ExcpFn] = Encode.html[ExcpFn](e=> Buf.Utf8(e.message.toString))
-
 
   implicit class FilterOps[A](val filter: Filter[Request, Response,A, Response]) extends AnyVal {
     def joinPath[B](path: Path => Option[(B,Path)]) = new Filter[Request, Response,Option[(A,B)], Response] {
@@ -65,6 +61,11 @@ package object routing extends ReqReads with Rout {
     def toFilter = new Filter[Request, Response, A, Response] {
       def apply(request: Request, service: Service[A, Response]) =
         rr(request) flatMap (a => a flatMap (aa => service(aa)))
+    }
+
+    def toFilter2[B] = new Filter[ReqExt[B], Response, (B,A), Response] {
+      def apply(requestExt: ReqExt[B], service: Service[(B,A), Response]) =
+        rr(requestExt.request) flatMap (a => a.flatMap(aa=> service((requestExt.value,aa))))
     }
 
     def joinOption[B](bfuture:ReqRead[Future[B]]): ReqRead[Future[(A,Option[B])]] =

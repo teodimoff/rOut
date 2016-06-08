@@ -8,25 +8,24 @@ import io.rout.file.{FileOps, FileOpsResponse}
 //maybe refactor with configurable ?
 case class Assets(file: FileOps, seq: Seq[RequestToService] = Nil)  {
   import Assets._
-  private val FNF = Future(notFound)
 
   def asset1(ap: String) = copy(file,seq :+ get(Root / ap / path[String]).service(r =>
-    file.read(Path(r.path).drop(Path(ap).depth).toString).response(FNF)))
+    file.read(Path(r.path).drop(Path(ap).depth).toString).response))
 
   def asset2(ap: String) =  copy(file,seq :+get(Root / ap / path[String] / path[String]).service(r =>
-    file.read(Path(r.path).drop(Path(ap).depth).toString).response(FNF)))
+    file.read(Path(r.path).drop(Path(ap).depth).toString).response))
 
   def asset3(ap: String) =  copy(file,seq :+
     get(Root / ap / path[String] / path[String] / path[String]).service(r =>
-      file.read(Path(r.path).drop(Path(ap).depth).toString).response(FNF)))
+      file.read(Path(r.path).drop(Path(ap).depth).toString).response))
 
   def asset4(ap: String) =  copy(file,seq :+
     get(Root / ap / path[String] / path[String] / path[String] / path[String]).service(r =>
-      file.read(Path(r.path).drop(Path(ap).depth).toString).response(FNF)))
+      file.read(Path(r.path).drop(Path(ap).depth).toString).response))
 
   def asset5(ap: String) =  copy(file,seq :+
     get(Root / ap / path[String] / path[String] / path[String] / path[String] / path[String]).service(r =>
-      file.read(Path(r.path).drop(Path(ap).depth).toString).response(FNF)))
+      file.read(Path(r.path).drop(Path(ap).depth).toString).response))
 
   def debug: Assets = copy(file,seq ++ Assets.addDebug(file))
 
@@ -34,7 +33,7 @@ case class Assets(file: FileOps, seq: Seq[RequestToService] = Nil)  {
 
   def +:(add: Seq[RequestToService]) = copy(file, add ++ seq)
 
-  def done = Routing(seq,FNF)
+  def done = Routing(seq)
 
   def asset(ap: String, depth: Int) = depth match {
     case 1 =>
@@ -60,7 +59,7 @@ object Assets  {
   def addDebug(file: FileOps) = Seq(
     get(Root / "see").service(request => file.seeAll()),
     get(Root / "local" / path[String]).service(param("path"))((path, localRoot) =>
-      file.static(localRoot + "/" + path, Future(notFound))))
+      file.static(localRoot + "/" + path, NotFoundException.Future)))
 
   def apply(size: StorageUnit) = new Assets(FileOps(size))
 
@@ -69,7 +68,7 @@ object Assets  {
   }
 
   implicit class FileOpsOps(val file: Future[Option[FileOpsResponse]]) extends AnyVal{
-    def response(notFound: Future[Response]) = file flatMap  {
+    def response = file flatMap  {
       case Some(resp)=>
         val response = Response()
         response.statusCode = 200
@@ -77,7 +76,7 @@ object Assets  {
         response.contentType = resp.contentType
         Future(response)
 
-      case None => notFound
+      case None => NotFoundException.Future
 
     }
   }

@@ -9,6 +9,8 @@ import com.twitter.util.{Await, Future}
 import io.rout._
 import io.routs._
 import io.rout.generic.decoding._
+import io.rout.routing.NotFoundException
+
 import scala.util.Random
 
 
@@ -95,9 +97,9 @@ object Main extends TwitterServer {
     .asset("a",3)
     .debug
     .done
-    .withNotFound("path was not found")
-    .handle{
-      case e: Exception => Status.NotFound -> e.getMessage
+    .handle {
+      case NotFoundException => NotFound(new Exception("path was not found"))
+      case e: Exception => NotFound(e)
     }
 
   def main(): Unit = {

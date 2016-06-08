@@ -2,29 +2,43 @@ package io.rout.routing
 
 import com.twitter.finagle.{Service, SimpleFilter}
 import com.twitter.finagle.http._
-import io.rout.ToResponse
+import com.twitter.io.Charsets
+import io.rout.{Output, ToResponse}
 
-case class ExcpFn(status: Status,message: String)
-
-object ExcFilter {
-  def apply[CT<: String](fn: PartialFunction[Throwable,ExcpFn] =
-                         PartialFunction.empty[Throwable,ExcpFn])(implicit tr: ToResponse.Aux[ExcpFn,CT]) =
-    ExceptionFilter(fn)(tr.apply)
+object ExceptionBasic extends SimpleFilter[Request,Response] {
+  def apply(request: Request, service: Service[Request, Response]) =
+    service(request) handle {
+      case error =>
+        val response = request.response
+        response.status =  Status.Forbidden
+       response
+    }
 }
 
-case class ExceptionFilter(fn: PartialFunction[Throwable,ExcpFn])
-                                       (tr: ExcpFn => Response) extends SimpleFilter[Request,Response] {
+/*
+object ExcFilter{
+  def apply[CT<: String,A](fn: PartialFunction[Throwable,Output[A]] =
+                         PartialFunction.empty[Throwable,Output[A]])(implicit tr: ToResponse.Aux[Output[A],CT]) =
+    ExceptionFilter(fn)(tr)
+}
+
+ */
+case class ExceptionFilter[CT,A](fn: PartialFunction[Throwable,Output[A]])
+                              (implicit tr: ToResponse.Aux[Output[A],CT]) extends SimpleFilter[Request,Response] {
+
   def apply(request: Request, service: Service[Request, Response]) = {
-    service(request) handle fn.orElse[Throwable,ExcpFn] {
+    service(request) handle fn.orElse[Throwable,Output[A]] {
       case error =>
         error match {
-          case _ => ExcpFn(Status.Forbidden,"")
+          case NotFoundException => Output.empty(Status.NotFound)
+          case _ => Output.empty(Status.Locked)
         }
     }.andThen { x =>
       val r = tr(x)
+      r.charset = Charsets.Utf8.toString
       r.status = x.status
       r
     }
   }
-}
 
+}

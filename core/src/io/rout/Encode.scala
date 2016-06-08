@@ -8,7 +8,7 @@ import io.rout.contentTypes._
 
 import scala.xml.NodeSeq
 import scalatags.Text.TypedTag
-
+import scalatags.Pretty._
 /**
  * An abstraction that is responsible for encoding the value of type `A`.
  */
@@ -45,8 +45,8 @@ trait LowPriorityEncodeInstances {
   def html[A](fn: A => Buf): TextHtml[A] =
     instance[A, Text.Html](fn)
 
-  def scalaTag[A](fn: A => TypedTag[String]): TextHtml[A] =
-    html[A](a=> Buf.Utf8(fn(a).render))
+  def scalaTag[A](fn: A => TypedTag[String])(implicit prettyPrint:Boolean): TextHtml[A] =
+    html[A](x=> Buf.Utf8(if(prettyPrint) fn(x).pretty() else  fn(x).render))
 
   implicit def encodeShow[A](implicit s: Show[A]): TextHtml[A] =
     html(a => Buf.Utf8(s.show(a)))
@@ -80,7 +80,10 @@ object Encode extends LowPriorityEncodeInstances {
   implicit val encodeString: TextHtml[String] =
     html(Buf.Utf8.apply)
 
-  implicit val encodehtml: TextHtml[TypedTag[String]] = html(x=> Buf.Utf8(x.render))
+  //implicit val encodehtml: TextHtml[TypedTag[String]] = html(x=> Buf.Utf8(x.render))
+
+  implicit def encodehtml(implicit prettyPrint:Boolean): Encode.TextHtml[TypedTag[String]] =
+    Encode.html(x=> Buf.Utf8(if(prettyPrint)x.pretty() else x.render))
 
   implicit val encodeXml: ApplicationXml[NodeSeq] = xml(x=> Buf.Utf8(x.toString()))
 

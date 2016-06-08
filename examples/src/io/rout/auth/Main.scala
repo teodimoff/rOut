@@ -77,9 +77,9 @@ object Main extends TwitterServer {
   ))
     .withNotFound("path was not found")
     .handle {
-      case t: TodoNotFound => Status.NotFound -> t.toString
-      case rua: RequestUnauthenticated => Status.Ok -> s"Authentication - ${rua.authResultCode}"
-      case t: Throwable => Status.BadRequest -> s"Bad Request ${t.fillInStackTrace().toString}"
+      case t: TodoNotFound => NotFound(t)
+      case rua: RequestUnauthenticated => Forbidden(rua)
+      case t: Throwable =>  Forbidden(new Exception(t))
     }
 
 
