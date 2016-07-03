@@ -6,7 +6,7 @@ import scala.reflect.ClassTag
 import com.twitter.finagle.http.Request
 import com.twitter.io.Buf
 import com.twitter.util.{Future, Return, Throw, Try}
-import shapeless.{::, Generic, HList, HNil}
+import shapeless.{::, Generic, HList, HNil, Lazy}
 import shapeless.ops.function.FnToProduct
 import shapeless.ops.hlist.Tupler
 
@@ -61,11 +61,18 @@ trait ReqRead[A] { self =>
     def apply(req: Request): Future[B] = self(req).map(fn)
   }
 
+/*
   /**
     * Joins this request reader with rrb.
     */
-  def join[B](rrb:ReqRead[B]):ReqRead[(A,B)] =
-    self.flatMap(ra=> rrb.map(ba => ra -> ba))
+  def join[B](rrb:Lazy[ReqRead[B]]):ReqRead[(A,B)] =
+    self.flatMap(ra=> rrb.value.map(ba => ra -> ba))
+
+
+  def join[B](rrb:ReqRead[Future[B]]):ReqRead[Future[(A,B)]] =
+    self.flatMap(ra=> rrb.map(ba => ba.map(baa => ra -> baa)))
+
+ */
 
   /**
    * Flat-maps this request reader to the given function `A => Future[B]`.

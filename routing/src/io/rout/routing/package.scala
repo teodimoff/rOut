@@ -44,8 +44,11 @@ package object routing extends ReqReads with Rout {
     def joinOption[B](b:ReqRead[B]):ReqRead[(A,Option[B])] =
       rr.flatMap(ra=> b.lift.map(ba => ra -> ba))
 
-    def join[B](b:ReqRead[B]):ReqRead[(A,B)] =
-      rr.flatMap(ra=> b.map(ba => ra -> ba))
+    def join[B](b:Lazy[ReqRead[B]]):ReqRead[(A,B)] =
+      rr.flatMap(ra=> b.value.map(ba => ra -> ba))
+
+    def join[B](b:ReqRead[Future[B]]):ReqRead[Future[(A,B)]] =
+      rr.flatMap(ra=> b.map(baa => baa.map(ba=> ra -> ba)))
   }
 
   implicit class ReqReadOpsOption[A](val rr: ReqRead[Option[A]]) extends AnyVal {
@@ -137,6 +140,8 @@ package object routing extends ReqReads with Rout {
   implicit class futureSwapFlat3[A](val future: Future[Option[Option[A]]]) extends AnyVal {
     def swapFlat: Future[Option[A]] = future map (_.flatten)
   }
+
+
 
 }
 

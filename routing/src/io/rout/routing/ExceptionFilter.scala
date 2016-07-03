@@ -31,7 +31,7 @@ case class ExceptionFilter[CT,A](fn: PartialFunction[Throwable,Output[A]])
       case error =>
         error match {
           case NotFoundException => Output.empty(Status.NotFound)
-          case _ => Output.empty(Status.Locked)
+          case _ => Output.empty(Status.Forbidden)
         }
     }.andThen { x =>
       val r = tr(x)

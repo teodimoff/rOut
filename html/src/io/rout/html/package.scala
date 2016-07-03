@@ -9,7 +9,7 @@ package object html {
 
   val tag = scalatags.Text.all
 
-  def scalaTag[A](a: Seq[A]) = tag.a(a.map(e => li(e.toString)))
+ // def scalaTag[A](a: Seq[A]) = tag.a(a.map(e => li(e.toString)))
 
   def scalaTag[A](f :A => TypedTag[String]) = f
 
