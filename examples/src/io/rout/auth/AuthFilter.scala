@@ -18,10 +18,10 @@ object AuthResultCode extends Enumeration {
   val OK,Fail = Value
 }
 
-case class AuthedReq(request: Request,passport: Passport) extends ReqExt[AuthedReq]
+case class AuthedReq(request: Request,passport: Passport)
 
 object AuthFilter {
-  val auth = Filter.mk[Request,Response,ReqExt[AuthedReq],Response]{(request,service) =>
+  val auth = Filter.mk[Request,Response,AuthedReq,Response]{(request,service) =>
     AuthService.authService(request).flatMap {
       case AuthResult(AuthResultCode.OK, Some(passport)) => service(AuthedReq(request,passport))
       case authResult: AuthResult =>

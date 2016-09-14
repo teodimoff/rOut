@@ -8,7 +8,7 @@ object Params extends App {
 
   val derivedPayload: ReqRead[Payload] = derive[Payload].fromParams
 
-  val regularPayload = post(Root)(derivedPayload) { payload =>
+  val regularPayload = post(Root).sync(derivedPayload) { payload =>
     Created(payload.toString)
   }
 

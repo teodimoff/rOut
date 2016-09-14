@@ -15,14 +15,6 @@ object ExceptionBasic extends SimpleFilter[Request,Response] {
     }
 }
 
-/*
-object ExcFilter{
-  def apply[CT<: String,A](fn: PartialFunction[Throwable,Output[A]] =
-                         PartialFunction.empty[Throwable,Output[A]])(implicit tr: ToResponse.Aux[Output[A],CT]) =
-    ExceptionFilter(fn)(tr)
-}
-
- */
 case class ExceptionFilter[CT,A](fn: PartialFunction[Throwable,Output[A]])
                               (implicit tr: ToResponse.Aux[Output[A],CT]) extends SimpleFilter[Request,Response] {
 
@@ -30,7 +22,7 @@ case class ExceptionFilter[CT,A](fn: PartialFunction[Throwable,Output[A]])
     service(request) handle fn.orElse[Throwable,Output[A]] {
       case error =>
         error match {
-          case NotFoundException => Output.empty(Status.NotFound)
+          case NotFoundException => NotFoundException.out
           case _ => Output.empty(Status.Forbidden)
         }
     }.andThen { x =>

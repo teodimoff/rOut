@@ -24,42 +24,42 @@ object Main extends TwitterServer {
 
   val derivedTodo: ReqRead[Todo] = derive[Int => Todo].incomplete.map(_(Random.nextInt(100000)))
 
-  val getTodos = get(Root / "todos").filter[AuthedReq](r => Ok(Todo.list().mkString("\n")))
+  val getTodos = get(Root / "todos").filter[AuthedReq].sync(r => Ok(Todo.list().mkString("\n")))
 
-  val getTodo = get(Root / "todo" / Match[Int]).filter[AuthedReq]{ (auth, id) =>
+  val getTodo = get(Root / "todo" / Match[Int]).filter[AuthedReq].sync{ (auth, id) =>
     Todo.get(id) match {
       case Some(t) => Todo.delete(id); Ok(t.toString)
       case None => throw new TodoNotFound(id)
     }
   }
 
-  val todo = post(Root / "todo").filter[AuthedReq](derivedTodo) { (auth, todo) =>
+  val todo = post(Root / "todo").filter[AuthedReq].sync(derivedTodo) { (auth, todo) =>
     todos.incr()
     Todo.save(todo)
     Created(s"User ${auth.passport.name.capitalize} Created -> ${todo.toString}")
   }
 
-  val todoPath = post(Root / "todo" / Match[String]).filter[AuthedReq](derivedTodo) { (auth, string, todo) =>
+  val todoPath = post(Root / "todo" / Match[String]).filter[AuthedReq].sync(derivedTodo) { (auth, string, todo) =>
     todos.incr()
     Todo.save(todo)
     Created(s"User ${auth.passport.name.toUpperCase} Created -> ${todo.toString}")
   }
 
-  val regularTodo = post(Root / "todo" / "regular")(derivedTodo) { todo =>
+  val regularTodo = post(Root / "todo" / "regular").sync(derivedTodo) { todo =>
     todos.incr()
     Todo.save(todo)
     Created(todo.toString)
   }
 
-  val getRegistered = get(Root / "registered")(r => Ok(PassportDatabase.list().mkString("\n")))
+  val getRegistered = get(Root / "registered").sync(r => Ok(PassportDatabase.list().mkString("\n")))
 
-  val register = post(Root / "register")(passportDerive){passport =>
+  val register = post(Root / "register").sync(passportDerive){passport =>
     passports.incr()
     PassportDatabase.save(passport)
     Created(passport.toString)
   }
 
-  val deleteRegistered = delete(Root / "registered") { req =>
+  val deleteRegistered = delete(Root / "registered").sync { req =>
     val all: List[Passport] = PassportDatabase.list()
     all.foreach(t => PassportDatabase.delete(t.password))
     Ok(all.mkString("\n"))

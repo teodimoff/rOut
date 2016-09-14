@@ -37,6 +37,24 @@ scala_library(name = 'benchmark-all',
     sources = globs('*.scala'),
 )
 
+scala_library(name = 'hello-world',
+  dependencies = [
+     '3rdparty/jvm/com/twitter:finagle-http',
+     '3rdparty/jvm/com/twitter:finagle-stats',
+     'projects3/rOut/core/src/io/rout:core',
+     'projects3/rOut/core/src/io:rout',
+  ],
+    sources = globs('package.scala','HelloWorld.scala'),
+)
+
+jvm_binary(name='binary-hello-world',
+  basename='rOut-benchmark-hello-world-app',
+  main='io.rout.example.benchmark.HelloWorld',
+  dependencies=[
+  ':hello-world'
+  ]
+)
+
 jvm_binary(name='binary',
   basename='rOut-benchmark-rOut-app',
   main='io.rout.benchmark.Rout',

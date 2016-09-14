@@ -46,4 +46,5 @@ case class Routing(seq: Seq[RequestToService],
 
 case object NotFoundException extends Exception {
   val Future = com.twitter.util.Future.exception(NotFoundException)
+  val out = Output.empty(Status.NotFound)
 }

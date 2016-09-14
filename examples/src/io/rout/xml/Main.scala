@@ -10,7 +10,7 @@ object Main extends App {
 
   val bodyXml = body.asXml[Payload]
 
-  val xmlPayload = post(Root)(bodyXml)(payload => Ok(payload))
+  val xmlPayload = post(Root).sync(bodyXml)(payload => Ok(payload))
 
   serve(mkRoutes(Seq(xmlPayload)).service)
 
@@ -33,7 +33,7 @@ object Semiauto extends App {
 
   val bodyXml = body.asXml[Payload]
 
-  val xmlPayload = post(Root)(bodyXml)(payload => Ok(payload))
+  val xmlPayload = post(Root).sync(bodyXml)(payload => Ok(payload))
 
   serve(mkRoutes(Seq(xmlPayload)).service)
 

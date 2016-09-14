@@ -3,8 +3,17 @@ package io.rout
 import shapeless.Witness
 
 object contentTypes {
+
+  /*
+  todo: make content-types bound by toplevel ContentType not by string and def for other content-types
+
+    type ContentType <: String
+
+    def withType(ct: String): Witness.Aux[String] =Witness.mkWitness(ct)
+   */
+
   object Application {
-    type Json = Witness.`"application/json"`.T
+    type Json  = Witness.`"application/json"`.T
     type Xml = Witness.`"application/xml"`.T
     type AtomXml = Witness.`"application/atom+xml"`.T
     type Csv = Witness.`"application/csv"`.T
@@ -12,6 +21,7 @@ object contentTypes {
     type OctetStream = Witness.`"application/octet-stream"`.T
     type RssXml = Witness.`"application/rss+xml"`.T
     type WwwFormUrlencoded = Witness.`"application/x-www-form-urlencoded"`.T
+
   }
 
   object Text {

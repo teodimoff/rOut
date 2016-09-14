@@ -8,8 +8,6 @@ trait Rout {
 
   val log = Logger()
 
-  def apply(seq: Seq[RequestToService]) = mkRoutes(seq)
-
   def mkRoutes(seq: Seq[RequestToService]) =
     Routing(seq)
 
@@ -22,52 +20,61 @@ trait Rout {
 
   val Root = io.rout.path.Root
 
-  def get[A](path: Path) = PathToService[A](Method.Get,path)
+  def get[CT <:String](path: Path) = PathToService[CT](Method.Get,path)
 
-  def get[A,B](path: Path => Option[(B,Path)]) =
-    PathToServiceOption[A,B](Method.Get,path)
+  def get[B,CT <:String](path: Path => Option[(B,Path)]) =
+    PathToServiceOption[B,CT](Method.Get,path)
 
-  def post[A](path: Path) =
-    PathToService[A](Method.Post,path)
+  def post[CT <:String](path: Path) =
+    PathToService[CT](Method.Post,path)
 
-  def post[A,B](path: Path => Option[(B,Path)]) =
-    PathToServiceOption[A,B](Method.Post,path)
+  def post[B,CT <:String](path: Path => Option[(B,Path)]) =
+    PathToServiceOption[B,CT](Method.Post,path)
 
-  def patch[A](path: Path) =
-    PathToService[A](Method.Patch,path)
+  def patch[CT <:String](path: Path) =
+    PathToService[CT](Method.Patch,path)
 
-  def patch[A,B](path: Path => Option[(B,Path)]) =
-    PathToServiceOption[A,B](Method.Patch,path)
+  def patch[B,CT <:String](path: Path => Option[(B,Path)]) =
+    PathToServiceOption[B,CT](Method.Patch,path)
 
-  def delete[A](path: Path) =
-    PathToService[A](Method.Delete,path)
+  def delete[CT <:String](path: Path) =
+    PathToService[CT](Method.Delete,path)
 
-  def delete[A,B](path: Path => Option[(B,Path)]) =
-    PathToServiceOption[A,B](Method.Delete,path)
+  def delete[B,CT <:String](path: Path => Option[(B,Path)]) =
+    PathToServiceOption[B,CT](Method.Delete,path)
 
-  def put[A](path: Path) =
-    PathToService[A](Method.Put,path)
+  def put[CT <:String](path: Path) =
+    PathToService[CT](Method.Put,path)
 
-  def put[A,B](path: Path => Option[(B,Path)]) =
-    PathToServiceOption[A,B](Method.Put,path)
+  def put[B,CT <:String](path: Path => Option[(B,Path)]) =
+    PathToServiceOption[B,CT](Method.Put,path)
 
-  def connect[A](path: Path) =
-    PathToService[A](Method.Connect,path)
+  def connect[CT <:String](path: Path) =
+    PathToService[CT](Method.Connect,path)
 
-  def connect[A,B](path: Path => Option[(B,Path)]) =
-    PathToServiceOption[A,B](Method.Connect,path)
+  def connect[B,CT <:String](path: Path => Option[(B,Path)]) =
+    PathToServiceOption[B,CT](Method.Connect,path)
 
-  def trace[A](path: Path) =
-    PathToService[A](Method.Trace,path)
+  def trace[CT <:String](path: Path) =
+    PathToService[CT](Method.Trace,path)
 
-  def trace[A,B](path: Path => Option[(B,Path)]) =
-    PathToServiceOption[A,B](Method.Trace,path)
+  def trace[B,CT <:String](path: Path => Option[(B,Path)]) =
+    PathToServiceOption[B,CT](Method.Trace,path)
 
-  def options[A](path: Path) =
-    PathToService[A](Method.Options,path)
+  def options[CT <:String](path: Path) =
+    PathToService[CT](Method.Options,path)
 
-  def options[A,B](path: Path => Option[(B,Path)]) =
-    PathToServiceOption[A,B](Method.Options,path)
+  def options[B,CT <:String](path: Path => Option[(B,Path)]) =
+    PathToServiceOption[B,CT](Method.Options,path)
 
 }
 
+/*
+object Rout {
+
+  def apply(seq: RequestToService*) = mkRoutes(seq: _*)
+
+  def apply(seq: Routable*) = mkRoutable(seq: _*)
+
+}
+ */

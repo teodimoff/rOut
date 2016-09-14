@@ -25,6 +25,11 @@ sealed trait Output[+A] { self =>
   def cookies: Seq[Cookie] = meta.cookies
 
   /**
+   *  Make future of this [[Output]].
+   */
+  def future: Future[Output[A]] = Future.value(self)
+
+  /**
    * Returns the payload value of this [[Output]] or throws an exception.
    */
   def value: A

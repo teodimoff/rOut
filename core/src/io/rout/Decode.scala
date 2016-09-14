@@ -2,11 +2,10 @@ package io.rout
 
 import java.util.UUID
 import cats.data.Xor
-import com.twitter.util.{Eval, Try}
+import com.twitter.util.Try
 import shapeless.{::, Generic, HNil, Witness}
 import scala.language.implicitConversions
 import scala.language.higherKinds
-import scala.reflect.ClassTag
 import io.rout.contentTypes._
 /**
  * An abstraction that is responsible for decoding the request of type `A`.

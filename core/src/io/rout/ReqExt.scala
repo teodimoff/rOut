@@ -10,3 +10,5 @@ trait ReqExt[A] {self: A =>
   def value: A = self
   def request: Request
 }
+
+case class ReqReadExt[A](value: A,request: Request)

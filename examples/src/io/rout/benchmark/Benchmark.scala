@@ -12,29 +12,29 @@ object Benchmark extends App {
 
   val paramsPayload: ReqRead[Payload] = derive[Payload].fromParams
 
-  val payloadParams = post(Root / "params")(paramsPayload) { payload =>
+  val payloadParams = post(Root / "params").sync(paramsPayload) { payload =>
     Created(payload.toString)
   }
 
-  val payloadParamsAuth = post(Root / "params" / "auth").filter[AuthedReq](paramsPayload) { (auth, payload) =>
+  val payloadParamsAuth = post(Root / "params" / "auth").filter[AuthedReq].sync(paramsPayload) { (auth, payload) =>
     Created(payload.toString)
   }
 
   val payloadParamsPathAuth =
-    post(Root / "params" / "auth" / Match[String]).filter[AuthedReq](paramsPayload) { (auth, string, payload) =>
+    post(Root / "params" / "auth" / Match[String]).filter[AuthedReq].sync(paramsPayload) { (auth, string, payload) =>
       Created(payload.toString)
     }
 
-  val payloadJsonAuth = post(Root / "json" / "auth").filter[AuthedReq](jsonPayload) { (auth, payload) =>
+  val payloadJsonAuth = post(Root / "json" / "auth").filter[AuthedReq].sync(jsonPayload) { (auth, payload) =>
     Created(payload)
   }
 
   val payloadJsonPathAuth =
-    post(Root / "json" / "auth" / Match[String]).filter[AuthedReq](jsonPayload) { (auth, string, payload) =>
+    post(Root / "json" / "auth" / Match[String]).filter[AuthedReq].sync(jsonPayload) { (auth, string, payload) =>
     Created(payload)
   }
 
-  val payloadJson = post(Root / "json")(jsonPayload)(p => Ok(p))
+  val payloadJson = post(Root / "json").sync(jsonPayload)(p => Ok(p))
 
   val rOut = mkRoutes(Seq(
     payloadParams,

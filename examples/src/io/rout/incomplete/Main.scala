@@ -36,47 +36,47 @@ object Main extends TwitterServer {
         todo.daysToComplete < 30 &&
         !todo.completed)
 
-  val getTodo = get(Root / "todo" / Match[Int]) { id =>
+  val getTodo = get(Root / "todo" / Match[Int]).sync { id =>
     Todo.get(id) match {
       case Some(t) => Todo.delete(id); Ok(t.toString)
       case None => throw new TodoNotFound(id)
     }
   }
 
-  val getTodos = get(Root / "todos")(r => Ok(Todo.list().mkString("\n")))
+  val getTodos = get(Root / "todos").sync(r => Ok(Todo.list().mkString("\n")))
 
-  val postTodo = post(Root / "todo")(postedTodo){todo =>
+  val postTodo = post(Root / "todo").sync(postedTodo){todo =>
     todos.incr()
     Todo.save(todo)
     Created(todo.toString)
   }
 
-  val postTodoRpc = post(Root / "todo" / "rpc")(rpcTodo){todo =>
+  val postTodoRpc = post(Root / "todo" / "rpc").apply(rpcTodo){todo =>
     todos.incr()
     Todo.save(todo)
-    Created(todo.toString)
+    Future(Created(todo.toString))
   }
 
-  val postTodoPath = post(Root / "todo" / Match[Int])(derivedTodo){ (id,todo)=>
+  val postTodoPath = post(Root / "todo" / Match[Int]).sync(derivedTodo){ (id,todo)=>
     todos.incr()
     val t = todo(id)
     Todo.save(t)
     Created(t.toString)
   }
 
-  val postTodoComplete = post(Root / "todo" / "complete")(completeTodo){todo =>
+  val postTodoComplete = post(Root / "todo" / "complete").sync(completeTodo){todo =>
     todos.incr()
     Todo.save(todo)
     Created(todo.toString)
   }
 
-  val deleteTodos = delete(Root / "todos") { req =>
+  val deleteTodos = delete(Root / "todos").sync{ req =>
     val all: List[Todo] = Todo.list()
     all.foreach(t => Todo.delete(t.id))
     Ok(all.mkString("\n"))
   }
 
-  val deleteTodo = delete(Root / "todo" / Match[Int]) { id =>
+  val deleteTodo = delete(Root / "todo" / Match[Int]).sync { id =>
     Todo.get(id) match {
       case Some(t) => Todo.delete(id); Ok(t.toString)
       case None => throw new TodoNotFound(id)

@@ -9,12 +9,12 @@ object CirceAuth extends App {
 
   val body = binaryBody.asJson[Payload]
 
-  val payloadAuth = post(Root).filter[AuthedReq](body) { (auth, payload) =>
+  val payloadAuth = post(Root).filter[AuthedReq].sync(body) { (auth, payload) =>
     Created(payload)
   }
 
-  serve(mkRoutes(Seq(
-    AuthFilter.auth andThen payloadAuth
-  )).service)
+  serve(
+    mkRoutes(Seq(AuthFilter.auth andThen payloadAuth)).service
+  )
 
 }

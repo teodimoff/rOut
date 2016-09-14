@@ -23,16 +23,6 @@ object enums {
   implicit def ecodeEnum[A <: Enumeration] = new Encoder[A#Value] {
     def apply(a: A#Value) = Encoder.encodeString.apply(a.toString)
   }
-
-  /*
-  implicit def decodeEnum[A <: Enumeration](implicit ct: ClassTag[A]) ={
-    new Decoder[(A with Enumeration)#Value]{
-      def apply(c: HCursor): io.circe.Decoder.Result[(A with Enumeration)#Value] =
-       Decoder.decodeString.map(s =>
-         time((new Eval).inPlace[A with Enumeration](ct.runtimeClass.getCanonicalName.dropRight(1)).withName(s))).apply(c)
-    }
-  }
- */
 }
 /*
 :paste

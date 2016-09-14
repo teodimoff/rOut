@@ -13,6 +13,8 @@ package object html {
 
   def scalaTag[A](f :A => TypedTag[String]) = f
 
+  def scalaModifier[A](f: A => Modifier) = f
+
   def render(pageTitle: String,a: Seq[Modifier])(
     pageRender: (String,Seq[Modifier]) => TypedTag[String]): TypedTag[String] = pageRender(pageTitle,a)
 }
